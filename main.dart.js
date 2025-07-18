@@ -45162,7 +45162,7 @@ n=f
 f=n.geR().c
 f=f==null?null:f.r
 m=f==null?null:f.a
-l=A.Q(["nome",d,"distancia_km",A.aFS(B.d.ac(a,2)),"duracao_prevista",b,"duracao_real",c,"velocidade_max_kmh",A.aFS(B.d.ac(a1,2)),"transporte",a0,"usuario_id",m],t.N,t.X)
+l=A.Q(["nome",d,"distancia_km",A.aFS(B.d.ac(a,2)),"duracao_prevista",b,"duracao_real",c,"velocidade_max_kmh",A.aFS(B.d.ac(a1,2)),"transporte",a0,"usuario_id",m,"destino_latitude",0,"destino_longitude",0],t.N,t.X)
 q=3
 if(m==null){f=A.e4("Usu\xe1rio n\xe3o autenticado")
 throw A.h(f)}s=6
@@ -105692,7 +105692,7 @@ B.aui=new A.y(!0,B.Q,null,".AppleSystemUIFont",null,null,null,null,null,null,nul
 B.auA=new A.y(!0,B.o,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.k,null,null,null,"blackRedwoodCity labelMedium",null,null,null,null)
 B.arz=new A.y(!0,B.o,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.k,null,null,null,"blackRedwoodCity labelSmall",null,null,null,null)
 B.avs=new A.en(B.atg,B.ash,B.ath,B.atR,B.arV,B.as2,B.asD,B.atE,B.asR,B.aum,B.arp,B.arK,B.aui,B.auA,B.arz)
-B.avt=new A.bS("1.0.22",null,null,null,null,null,null,null,null)
+B.avt=new A.bS("1.0.23",null,null,null,null,null,null,null,null)
 B.auF=new A.y(!0,null,null,null,null,null,20,B.dt,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.avu=new A.bS("\ud83d\udccb Relat\xf3rio da Viagem",null,B.auF,null,null,null,null,null,null)
 B.avv=new A.bS("Deseja salvar o relat\xf3rio desta viagem?",null,null,null,null,null,null,null,null)
