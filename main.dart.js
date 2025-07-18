@@ -44979,17 +44979,17 @@ A.avz.prototype={
 $1(a){this.a.yy()},
 $S:7}
 A.av_.prototype={
-$1(a){var s,r,q,p,o,n=this.a
-if(n.go>=J.c0(n.id)-1){s=n.k1
+$1(a){var s,r,q,p,o,n,m=this.a
+if(m.go>=J.c0(m.id)-1){s=m.k1
 if(s!=null)s.aw(0)
-n.fy=!1
-return}r=J.aB(n.id,n.go)
-q=J.aB(n.id,n.go+1)
-p=q.b-r.b
-s=q.a
-o=r.a
-n.ab(new A.auZ(n,r,B.d.be(Math.atan2(Math.sin(p)*Math.cos(s),Math.cos(o)*Math.sin(s)-Math.sin(o)*Math.cos(s)*Math.cos(p))*180/3.141592653589793+360,360)))
-n.tY();++n.go},
+m.fy=!1
+return}r=J.aB(m.id,m.go)
+q=J.aB(m.id,m.go+1)
+p=r.a*3.141592653589793/180
+o=q.a*3.141592653589793/180
+n=q.b*3.141592653589793/180-r.b*3.141592653589793/180
+m.ab(new A.auZ(m,r,B.d.be(Math.atan2(Math.sin(n)*Math.cos(o),Math.cos(p)*Math.sin(o)-Math.sin(p)*Math.cos(o)*Math.cos(n))*180/3.141592653589793+360,360)))
+m.tY();++m.go},
 $S:71}
 A.auZ.prototype={
 $0(){var s=this.a
@@ -104714,7 +104714,7 @@ B.avH=new A.c4("Configura\xe7\xf5es",null,null,null,null,null,null,null,null)
 B.avJ=new A.c4("Fechar",null,null,null,null,null,null,null,null)
 B.avK=new A.c4("Vers\xe3o do App",null,null,null,null,null,null,null,null)
 B.avL=new A.c4("Recarregar Mapa",null,null,null,null,null,null,null,null)
-B.avN=new A.c4("1.0.17",null,null,null,null,null,null,null,null)
+B.avN=new A.c4("1.0.18",null,null,null,null,null,null,null,null)
 B.avQ=new A.c4("Criar Conta",null,null,null,null,null,null,null,null)
 B.as_=new A.A(!0,null,null,null,null,null,18,B.dq,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.avR=new A.c4("\ud83d\udccd Detalhes da Parada",null,B.as_,null,null,null,null,null,null)
