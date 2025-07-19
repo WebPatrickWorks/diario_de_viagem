@@ -8099,7 +8099,9 @@ _.f=a
 _.r=b
 _.z=_.y=_.x=_.w=null
 _.Q=0
-_.c=_.a=_.as=null},
+_.as=null
+_.at=!1
+_.c=_.a=null},
 a9m:function a9m(a,b,c){this.a=a
 this.b=b
 this.c=c},
@@ -44370,6 +44372,7 @@ s=8
 return A.r(t.uz.b(e)?e:A.fE(e,t.H),$async$ur)
 case 8:e=n.as
 if(e!=null)e.av(0)
+n.at=!1
 n.as=$.mY().My(B.Qb).cm(new A.a9z(n,m,a))
 p=2
 s=6
@@ -44536,23 +44539,24 @@ $1(a){return a.a.a==="destino"},
 $S:61}
 A.a9z.prototype={
 $1(a){return this.a0S(a)},
-a0S(a){var s=0,r=A.w(t.H),q=this,p,o,n,m
+a0S(a){var s=0,r=A.w(t.H),q=this,p,o,n,m,l
 var $async$$1=A.x(function(b,c){if(b===1)return A.t(c,r)
-while(true)switch(s){case 0:n=A.f4(a.a,a.b)
-m=q.a
+while(true)switch(s){case 0:m=A.f4(a.a,a.b)
+l=q.a
 s=2
-return A.r(m.tN(n),$async$$1)
-case 2:p=A.aLw(q.b,n)
+return A.r(l.tN(m),$async$$1)
+case 2:p=A.aLw(q.b,m)
 o=B.d.h_(a.y*3.6,0,999)
-m.al(new A.a9w(m,n,p,o))
-m.a.c.$1(n)
-s=p<30?3:4
+l.al(new A.a9w(l,m,p,o))
+l.a.c.$1(m)
+s=p<30&&!l.at?3:4
 break
-case 3:s=5
-return A.r(m.qs(q.c),$async$$1)
-case 5:m=m.as
-if(m!=null)m.av(0)
-case 4:return A.u(null,r)}})
+case 3:l.at=!0
+n=l.as
+if(n!=null)n.av(0)
+s=5
+return A.r(l.qs(q.c),$async$$1)
+case 5:case 4:return A.u(null,r)}})
 return A.v($async$$1,r)},
 $S:418}
 A.a9w.prototype={
@@ -103475,7 +103479,7 @@ B.auv=new A.c4("Salvar Relat\xf3rio?",null,null,null,null,null,null,null,null)
 B.GJ=new A.c4("Cancelar",null,null,null,null,null,null,null,null)
 B.auy=new A.c4("Exibir anota\xe7\xf5es",null,null,null,null,null,null,null,null)
 B.auA=new A.c4("Criar nova conta",null,null,null,null,null,null,null,null)
-B.auB=new A.c4("1.1.5",null,null,null,null,null,null,null,null)
+B.auB=new A.c4("1.1.7",null,null,null,null,null,null,null,null)
 B.ark=new A.A(!0,B.m,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.auC=new A.c4("Arraste o mapa para ajustar o destino e toque em Confirmar abaixo",null,B.ark,B.hD,null,null,null,null,null)
 B.aqV=new A.A(!0,null,null,null,null,null,18,B.ef,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
