@@ -49226,7 +49226,7 @@ r=t.D
 q=A.c([],r)
 p=s!=null
 if(p){o=s.z
-B.c.W(q,A.c([A.tL(B.tB,n,B.JF,A.cs(o==null?"Usu\xe1rio":o,n,n,n,n,n,n)),B.jb],r))}q.push(A.tL(B.tA,n,B.aFd,B.JK))
+B.c.W(q,A.c([A.tL(B.tB,n,B.JF,A.cs(o==null?"Usu\xe1rio":o,n,n,n,n,n,n)),B.jb],r))}q.push(A.tL(B.tA,n,B.aFe,B.JK))
 q.push(B.jb)
 r=A.ly(p?B.ts:B.mX,n,n,n)
 q.push(A.tL(r,new A.aa3(s,a),n,A.cs(p?"Sair":"Login",n,n,n,n,n,n)))
@@ -49625,7 +49625,7 @@ return null},
 $S:0}
 A.adn.prototype={
 $1(a){var s=null,r=this.a
-return A.wd(A.c([A.nU(B.fL,new A.adl(r),s),A.xl(!1,B.aF4,s,s,s,s,s,s,new A.adm(r),s,s)],t.D),B.aEX,B.aFb)},
+return A.wd(A.c([A.nU(B.fL,new A.adl(r),s),A.xl(!1,B.aF5,s,s,s,s,s,s,new A.adm(r),s,s)],t.D),B.aEY,B.aFc)},
 $S:54}
 A.adl.prototype={
 $0(){A.cc(this.a,!1).dj(!1)
@@ -49983,7 +49983,7 @@ f=f.geK().c
 f=f==null?null:f.r
 m=f==null?null:f.a
 if(m==null){g=A.e_("Usu\xe1rio n\xe3o autenticado")
-throw A.f(g)}l="fotos_ponto/"+m+"/"+A.m(n)+".jpg"
+throw A.f(g)}l=A.m(n)+".jpg"
 s=8
 return A.r(d.rV(),$async$nt)
 case 8:k=a2
@@ -50027,7 +50027,7 @@ if(s){s=A.o(r).i("aT<bZ.E>")
 s=A.cv(new A.aT(r,new A.ag9(),s),s.i("l.E"))}else s=r
 r=t.D
 s=A.c([new A.DW(new A.aga(p),new A.ka(0,n,0,15),p.a.w,!1,!1,s,p.r,new A.agb(p),!0,!1,o)],r)
-if(p.a.d)B.c.W(s,A.c([B.RC,A.uw(o,A.x1(B.aFm,B.J,new A.f0(B.T,o,o,A.oJ(8),o,o,B.bu),o,o,B.rO,o),o,o,20,20,20,o),A.uw(32,A.fG(B.Rr,B.aF9,p.galv(),A.aLV(o,o,B.DI,o,o,o,o,o,o,o,o,o,B.rN,o,o,o,o,o,B.pD,o)),o,o,32,32,o,o),A.uw(o,A.ly(p.ap3(p.a.f),B.M,o,36),o,o,16,o,16,o)],r))
+if(p.a.d)B.c.W(s,A.c([B.RC,A.uw(o,A.x1(B.aFm,B.J,new A.f0(B.T,o,o,A.oJ(8),o,o,B.bu),o,o,B.rO,o),o,o,20,20,20,o),A.uw(32,A.fG(B.Rr,B.aFa,p.galv(),A.aLV(o,o,B.DI,o,o,o,o,o,o,o,o,o,B.rN,o,o,o,o,o,B.pD,o)),o,o,32,32,o,o),A.uw(o,A.ly(p.ap3(p.a.f),B.M,o,36),o,o,16,o,16,o)],r))
 n=p.x
 if(n!=null&&p.z!=null&&p.y!=null){r=p.y
 r.toString
@@ -50146,7 +50146,7 @@ return A.y($async$$0,r)},
 $S:8}
 A.afW.prototype={
 $1(a){var s=null,r=this.a
-return A.wd(A.c([A.nU(B.aEW,new A.afU(r),s),A.xl(!1,B.aF2,s,s,s,s,s,s,new A.afV(r),s,s)],t.D),B.aFA,B.aFc)},
+return A.wd(A.c([A.nU(B.aEX,new A.afU(r),s),A.xl(!1,B.aF3,s,s,s,s,s,s,new A.afV(r),s,s)],t.D),B.aFA,B.aFd)},
 $S:54}
 A.afU.prototype={
 $0(){var s=this.a.c
@@ -50211,7 +50211,7 @@ q=J.a9(n)
 if(q.gcL(n))B.c.W(s,A.c([B.Kt,B.im,A.fR(A.b4J(new A.afD(a,n),q.gn(n),B.bb,new A.afE()),120,o),B.kZ],r))
 r=p.a
 q=p.c
-s.push(A.fG(B.tC,B.aEZ,new A.afF(r,a,q),o))
+s.push(A.fG(B.tC,B.aF_,new A.afF(r,a,q),o))
 s.push(B.im)
 s.push(A.fG(B.tz,B.aFh,new A.afG(r,a,q),o))
 s.push(B.im)
@@ -50386,7 +50386,7 @@ return A.y($async$$0,r)},
 $S:8}
 A.afy.prototype={
 $1(a){var s=null
-return A.wd(A.c([A.nU(B.fL,new A.afs(a),s),A.xl(!1,B.JI,s,s,s,s,s,s,new A.aft(a),s,s)],t.D),B.aF6,B.JH)},
+return A.wd(A.c([A.nU(B.fL,new A.afs(a),s),A.xl(!1,B.JI,s,s,s,s,s,s,new A.aft(a),s,s)],t.D),B.aF7,B.JH)},
 $S:54}
 A.afs.prototype={
 $0(){A.cc(this.a,!1).dj(!1)
@@ -50424,7 +50424,7 @@ $0(){this.a.f=this.b},
 $S:0}
 A.afR.prototype={
 $1(a){var s=null
-return new A.cq(B.dk,A.kf(A.c([B.aEY,B.kZ,A.fG(B.ty,B.aF5,new A.afQ(this.a,this.b),A.aLV(s,s,B.oC,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s))],t.D),B.aY,B.aK,B.bH),s)},
+return new A.cq(B.dk,A.kf(A.c([B.aEZ,B.kZ,A.fG(B.ty,B.aF6,new A.afQ(this.a,this.b),A.aLV(s,s,B.oC,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s))],t.D),B.aY,B.aK,B.bH),s)},
 $S:99}
 A.afQ.prototype={
 $0(){var s=0,r=A.z(t.H),q=1,p=[],o=this,n,m,l,k,j,i
@@ -50466,7 +50466,7 @@ return A.y($async$$0,r)},
 $S:8}
 A.afO.prototype={
 $1(a){var s=null,r=this.a
-return A.wd(A.c([A.nU(B.fL,new A.afM(r),s),A.xl(!1,B.JI,s,s,s,s,s,s,new A.afN(r),s,s)],t.D),B.aF_,B.JH)},
+return A.wd(A.c([A.nU(B.fL,new A.afM(r),s),A.xl(!1,B.JI,s,s,s,s,s,s,new A.afN(r),s,s)],t.D),B.aF0,B.JH)},
 $S:54}
 A.afM.prototype={
 $0(){var s=this.a.c
@@ -50528,7 +50528,7 @@ n=t.D
 r=A.c([B.aFy,B.cj],n)
 q=s!=null
 if(q){p=s.z
-B.c.W(r,A.c([A.tL(B.tB,o,B.JF,A.cs(p==null?"Usu\xe1rio":p,o,o,o,o,o,o)),B.jb],n))}r.push(A.tL(B.tA,o,B.aFe,B.JK))
+B.c.W(r,A.c([A.tL(B.tB,o,B.JF,A.cs(p==null?"Usu\xe1rio":p,o,o,o,o,o,o)),B.jb],n))}r.push(A.tL(B.tA,o,B.aEW,B.JK))
 r.push(B.jb)
 n=A.ly(q?B.ts:B.mX,o,o,o)
 r.push(A.tL(n,new A.aa1(s,a),o,A.cs(q?"Sair da conta":"Login",o,o,o,o,o,o)))
@@ -50569,7 +50569,7 @@ j=A.fG(j,A.cs(k?"Ocultar anota\xe7\xf5es":"Exibir anota\xe7\xf5es",o,o,o,o,o,o),
 k=n.x
 s=A.ly(k?B.tw:B.tv,o,o,o)
 s=A.fG(s,A.cs(k?"Ocultar pardais":"Exibir pardais",o,o,o,o,o,o),new A.anU(n,m),o)
-r=A.fG(B.Rq,B.aF1,new A.anV(n,m),o)
+r=A.fG(B.Rq,B.aF2,new A.anV(n,m),o)
 q=A.fG(B.Rt,B.aFF,new A.anW(n,m),o)
 k=n.z
 p=A.ly(k?B.R3:B.QZ,o,o,o)
@@ -117979,9 +117979,9 @@ B.lx=new A.w9(1,"requestedFocus")
 B.Kq=new A.w9(2,"receivedDomFocus")
 B.Kr=new A.w9(3,"receivedDomBlur")
 B.aJe=new A.a7K(0,"unknown")
-B.aF7=new A.bp("\u2705 Relat\xf3rio salvo",null,null,null,null,null,null,null,null)
+B.aF8=new A.bp("\u2705 Relat\xf3rio salvo",null,null,null,null,null,null,null,null)
 B.aFt=new A.bp("Seu relat\xf3rio de chegada foi registrado com sucesso.",null,null,null,null,null,null,null,null)
-B.Ks=new A.mC(B.aF7,B.aFt,null,null)
+B.Ks=new A.mC(B.aF8,B.aFt,null,null)
 B.iF=new A.eZ(-1,0)
 B.dl=new A.jt(6)
 B.cl=new A.D(!0,null,null,null,null,null,null,B.dl,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
@@ -123447,20 +123447,20 @@ B.aFu=new A.bp("\u270f\ufe0f Anota\xe7\xe3o atualizada",null,null,null,null,null
 B.azF=new A.fp(B.aFu,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
 B.aFv=new A.bp("\ud83d\udcdd Anota\xe7\xe3o e foto salvas offline",null,null,null,null,null,null,null,null)
 B.azG=new A.fp(B.aFv,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
-B.aF8=new A.bp("Nenhum destino nomeado encontrado",null,null,null,null,null,null,null,null)
-B.azH=new A.fp(B.aF8,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
+B.aF9=new A.bp("Nenhum destino nomeado encontrado",null,null,null,null,null,null,null,null)
+B.azH=new A.fp(B.aF9,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
 B.aFj=new A.bp("\u2714\ufe0f Sincroniza\xe7\xe3o conclu\xedda",null,null,null,null,null,null,null,null)
 B.azI=new A.fp(B.aFj,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
 B.aFC=new A.bp("Anota\xe7\xe3o salva com sucesso!",null,null,null,null,null,null,null,null)
 B.azJ=new A.fp(B.aFC,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
-B.aF3=new A.bp("\ud83d\udce1 Pardal marcado com sucesso!",null,null,null,null,null,null,null,null)
-B.azK=new A.fp(B.aF3,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
-B.aFa=new A.bp("\ud83d\uddd1\ufe0f Anota\xe7\xe3o e fotos exclu\xeddas",null,null,null,null,null,null,null,null)
-B.azL=new A.fp(B.aFa,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
+B.aF4=new A.bp("\ud83d\udce1 Pardal marcado com sucesso!",null,null,null,null,null,null,null,null)
+B.azK=new A.fp(B.aF4,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
+B.aFb=new A.bp("\ud83d\uddd1\ufe0f Anota\xe7\xe3o e fotos exclu\xeddas",null,null,null,null,null,null,null,null)
+B.azL=new A.fp(B.aFb,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
 B.aFg=new A.bp("\ud83d\udce6 Relat\xf3rio salvo localmente",null,null,null,null,null,null,null,null)
 B.azM=new A.fp(B.aFg,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
-B.aF0=new A.bp("Rota cancelada",null,null,null,null,null,null,null,null)
-B.azN=new A.fp(B.aF0,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
+B.aF1=new A.bp("Rota cancelada",null,null,null,null,null,null,null,null)
+B.azN=new A.fp(B.aF1,null,null,null,null,null,null,null,null,null,null,null,null,B.ac,null,null,null,B.y,null)
 B.Jh=new A.Hs(0,"permissive")
 B.azO=new A.Hs(1,"normal")
 B.azP=new A.Hs(2,"forced")
@@ -123826,26 +123826,26 @@ B.aB1=new A.D(!0,B.p,null,".AppleSystemUIFont",null,null,null,null,null,null,nul
 B.aES=new A.eN(B.aCG,B.aBJ,B.aCH,B.aDg,B.aBn,B.aBu,B.aC3,B.aD3,B.aCh,B.aDM,B.aAS,B.aBc,B.aDI,B.aE_,B.aB1)
 B.aET=new A.bp("Cadastrar",null,null,null,null,null,null,null,null)
 B.aEU=new A.bp("Excluir anota\xe7\xe3o",null,null,null,null,null,null,null,null)
+B.aEW=new A.bp("1.1.20",null,null,null,null,null,null,null,null)
 B.JE=new A.bp("Entrar",null,null,null,null,null,null,null,null)
-B.aEW=new A.bp("N\xe3o",null,null,null,null,null,null,null,null)
-B.aEX=new A.bp("Deseja marcar um radar neste local?",null,null,null,null,null,null,null,null)
-B.aEY=new A.bp("\ud83d\udce1 Pardal marcado aqui",null,B.pD,null,null,null,null,null,null)
-B.aEZ=new A.bp("Tirar nova foto",null,null,null,null,null,null,null,null)
-B.aF_=new A.bp("Deseja realmente excluir este pardal?",null,null,null,null,null,null,null,null)
-B.aF1=new A.bp("Ir para destino salvo",null,null,null,null,null,null,null,null)
-B.aF2=new A.bp("Sim",null,null,null,null,null,null,null,null)
+B.aEX=new A.bp("N\xe3o",null,null,null,null,null,null,null,null)
+B.aEY=new A.bp("Deseja marcar um radar neste local?",null,null,null,null,null,null,null,null)
+B.aEZ=new A.bp("\ud83d\udce1 Pardal marcado aqui",null,B.pD,null,null,null,null,null,null)
+B.aF_=new A.bp("Tirar nova foto",null,null,null,null,null,null,null,null)
+B.aF0=new A.bp("Deseja realmente excluir este pardal?",null,null,null,null,null,null,null,null)
+B.aF2=new A.bp("Ir para destino salvo",null,null,null,null,null,null,null,null)
+B.aF3=new A.bp("Sim",null,null,null,null,null,null,null,null)
 B.JF=new A.bp("Perfil",null,null,null,null,null,null,null,null)
 B.pE=new A.bp("Salvar",null,null,null,null,null,null,null,null)
-B.aF4=new A.bp("Marcar",null,null,null,null,null,null,null,null)
-B.aF5=new A.bp("Excluir pardal",null,null,null,null,null,null,null,null)
-B.aF6=new A.bp("Deseja excluir esta anota\xe7\xe3o e todas as fotos associadas?",null,null,null,null,null,null,null,null)
+B.aF5=new A.bp("Marcar",null,null,null,null,null,null,null,null)
+B.aF6=new A.bp("Excluir pardal",null,null,null,null,null,null,null,null)
+B.aF7=new A.bp("Deseja excluir esta anota\xe7\xe3o e todas as fotos associadas?",null,null,null,null,null,null,null,null)
 B.JG=new A.bp("Editar anota\xe7\xe3o",null,null,null,null,null,null,null,null)
-B.aF9=new A.bp("Confirmar destino",null,null,null,null,null,null,null,null)
-B.aFb=new A.bp("Confirmar marca\xe7\xe3o de pardal",null,null,null,null,null,null,null,null)
-B.aFc=new A.bp("Salvar relat\xf3rio?",null,null,null,null,null,null,null,null)
+B.aFa=new A.bp("Confirmar destino",null,null,null,null,null,null,null,null)
+B.aFc=new A.bp("Confirmar marca\xe7\xe3o de pardal",null,null,null,null,null,null,null,null)
+B.aFd=new A.bp("Salvar relat\xf3rio?",null,null,null,null,null,null,null,null)
 B.fL=new A.bp("Cancelar",null,null,null,null,null,null,null,null)
-B.aFd=new A.bp("1.1.16",null,null,null,null,null,null,null,null)
-B.aFe=new A.bp("1.1.19",null,null,null,null,null,null,null,null)
+B.aFe=new A.bp("1.1.16",null,null,null,null,null,null,null,null)
 B.aFh=new A.bp("Selecionar da galeria",null,null,null,null,null,null,null,null)
 B.JH=new A.bp("Confirmar exclus\xe3o",null,null,null,null,null,null,null,null)
 B.aFi=new A.bp("Recalcular Rota",null,null,null,null,null,null,null,null)
