@@ -49621,7 +49621,7 @@ A.a0A.prototype={
 aS(){var s=this
 s.b6()
 if($.afq.a!==0)s.al(new A.aED(s))
-else s.tU()},
+else if(!s.w)s.tU()},
 afR(a,b){var s,r={},q=A.aV0(b)
 r.a=b
 s=this.c
@@ -125836,7 +125836,7 @@ B.aCu=new A.D(!0,B.n,null,null,null,null,null,null,null,null,null,null,null,null
 B.aGc=new A.b0("Arraste o mapa para ajustar o destino e toque em Confirmar abaixo",null,B.aCu,B.d7,null,null,null,null,null)
 B.aGd=new A.b0("\u2699\ufe0f Fun\xe7\xf5es R\xe1pidas",null,B.iz,null,null,null,null,null,null)
 B.K6=new A.b0("Configura\xe7\xf5es",null,null,null,null,null,null,null,null)
-B.aGj=new A.b0("1.2.18",null,null,null,null,null,null,null,null)
+B.aGj=new A.b0("1.2.19",null,null,null,null,null,null,null,null)
 B.aGk=new A.b0("Fechar",null,null,null,null,null,null,null,null)
 B.K7=new A.b0("Vers\xe3o do App",null,null,null,null,null,null,null,null)
 B.aGl=new A.b0("Tirar/Selecionar Foto",null,null,null,null,null,null,null,null)
