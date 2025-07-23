@@ -55,9 +55,19 @@
 </head>
 <body>
 
-  <button class="btn-fechar" onclick="window.opener?.postMessage('fechar-player', '*')">✖ Fechar</button>
+<button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
 
-  <iframe id="player" allow="autoplay; encrypted-media"></iframe>
+  <script>
+    function fecharPlayer() {
+      window.opener?.postMessage('fechar-player', '*');
+
+      // Tenta fechar a aba (funciona somente se esta janela foi aberta com window.open())
+      window.history.back();
+    }
+    
+  </script>  
+
+  <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
   <script>
     const params = new URLSearchParams(window.location.search);
