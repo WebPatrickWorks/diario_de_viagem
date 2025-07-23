@@ -55,7 +55,7 @@
 </head>
 <body>
 
-  <button class="btn-fechar" onclick="window.history.back()">✖ Fechar</button>
+  <button class="btn-fechar" onclick="window.opener?.postMessage('fechar-player', '*')">✖ Fechar</button>
 
   <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
