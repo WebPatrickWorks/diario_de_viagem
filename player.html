@@ -83,7 +83,7 @@
 <body>
 
   <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
-  <button class="btn-som" onclick="ativarSom()">🔊 Ativar Som</button>
+  <button class="btn-som" id="btnSom" onclick="ativarSom()">🔊 Ativar Som</button>
 
   <div id="player"></div>
 
@@ -123,6 +123,9 @@
       if (player) {
         player.unMute();
         player.setVolume(100);
+        // Oculta o botão após ativar o som
+        const btn = document.getElementById('btnSom');
+        if (btn) btn.style.display = 'none';
       }
     }
   </script>
