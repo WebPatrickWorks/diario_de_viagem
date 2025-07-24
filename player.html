@@ -70,6 +70,10 @@
     let indexAtual = 0;
     let somAtivado = false;
 
+    const params = new URLSearchParams(window.location.search);
+    const videoInicial = params.get('v');
+    let indexInicial = 0;
+
     try {
       const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
       Object.values(cache).forEach(cidade => {
@@ -81,6 +85,11 @@
       });
     } catch (e) {
       console.warn('Erro ao carregar cache:', e);
+    }
+
+    if (videoInicial) {
+      const foundIndex = videoIds.findIndex(id => id === videoInicial);
+      if (foundIndex >= 0) indexInicial = foundIndex;
     }
 
     videoIds.forEach((id, i) => {
@@ -96,23 +105,31 @@
       playerDivs.push(div.id);
     });
 
+    function scrollToIndex(i) {
+      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
+      indexAtual = i;
+    }
+
     function onYouTubeIframeAPIReady() {
       playerDivs.forEach((divId, i) => {
         const player = new YT.Player(divId, {
           videoId: videoIds[i],
           playerVars: {
-            autoplay: i === 0 ? 1 : 0,
+            autoplay: i === indexInicial ? 1 : 0,
             mute: 1,
             playsinline: 1
           },
           events: {
             onReady: (event) => {
-              if (i !== 0) event.target.pauseVideo();
+              if (i !== indexInicial) event.target.pauseVideo();
+              if (i === indexInicial && somAtivado) event.target.unMute();
             }
           }
         });
         players.push(player);
       });
+
+      scrollToIndex(indexInicial);
     }
 
     container.addEventListener('scroll', () => {
