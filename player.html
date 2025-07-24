@@ -67,7 +67,14 @@
     
   </script>  
 
-  <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  <iframe
+    id="player"
+    style="visibility: hidden;"
+    allow="autoplay; encrypted-media"
+    allowfullscreen
+    onload="this.style.visibility='visible'">
+  </iframe>
+
 
   <script>
     const params = new URLSearchParams(window.location.search);
