@@ -13,21 +13,20 @@
       overflow: hidden;
     }
 
-    iframe {
+    #player {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      border: none;
       z-index: 0;
     }
 
     .btn-fechar {
-      position: absolute;
+      position: fixed;
       top: 16px;
       right: 16px;
-      z-index: 10;
+      z-index: 9999;
       background-color: rgba(255, 82, 82, 0.9);
       color: white;
       border: none;
@@ -43,11 +42,39 @@
       background-color: rgba(230, 50, 50, 1);
     }
 
+    .btn-som {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 9999;
+      background-color: rgba(82, 255, 100, 0.9);
+      color: black;
+      border: none;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s;
+    }
+
+    .btn-som:hover {
+      background-color: rgba(60, 200, 80, 1);
+    }
+
     @media (max-width: 600px) {
-      .btn-fechar {
+      .btn-fechar, .btn-som {
         font-size: 14px;
         padding: 8px 14px;
+      }
+
+      .btn-fechar {
         top: 12px;
+        right: 12px;
+      }
+
+      .btn-som {
+        bottom: 12px;
         right: 12px;
       }
     }
@@ -55,31 +82,51 @@
 </head>
 <body>
 
-<button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
+  <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
+  <button class="btn-som" onclick="ativarSom()">🔊 Ativar Som</button>
+
+  <div id="player"></div>
 
   <script>
     function fecharPlayer() {
       window.opener?.postMessage('fechar-player', '*');
-
-      // Tenta fechar a aba (funciona somente se esta janela foi aberta com window.open())
       window.history.back();
     }
-    
-  </script>  
 
-  <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    let player;
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const videoId = params.get('v');
-    if (videoId) {
-      document.getElementById('player').src =
-        `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`;
-    } else {
-      document.body.innerHTML =
-        '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
+    function onYouTubeIframeAPIReady() {
+      const params = new URLSearchParams(window.location.search);
+      const videoId = params.get('v');
+
+      if (!videoId) {
+        document.body.innerHTML = '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
+        return;
+      }
+
+      player = new YT.Player('player', {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1
+        },
+        events: {
+          onReady: event => event.target.playVideo()
+        }
+      });
+    }
+
+    function ativarSom() {
+      if (player) {
+        player.unMute();
+        player.setVolume(100);
+      }
     }
   </script>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
