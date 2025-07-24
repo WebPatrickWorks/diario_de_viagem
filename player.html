@@ -141,6 +141,7 @@
 
       players.forEach((player, i) => {
         if (i === index) {
+          player.seekTo(0, true);
           player.playVideo();
           if (somAtivado) player.unMute();
         } else {
