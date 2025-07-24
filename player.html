@@ -130,28 +130,6 @@
       contador.textContent = `📹 ${indexAtual + 1} / ${videoIds.length}`;
     }
 
-    function fadeInVolume(player) {
-      let volume = 0;
-      player.setVolume(volume);
-      const fadeIn = setInterval(() => {
-        volume += 10;
-        player.setVolume(volume);
-        if (volume >= 100) clearInterval(fadeIn);
-      }, 100);
-    }
-
-    function fadeOutVolume(player) {
-      let volume = 100;
-      const fadeOut = setInterval(() => {
-        volume -= 10;
-        player.setVolume(volume);
-        if (volume <= 0) {
-          clearInterval(fadeOut);
-          player.pauseVideo();
-        }
-      }, 100);
-    }
-
     function onYouTubeIframeAPIReady() {
       playerDivs.forEach((divId, i) => {
         const player = new YT.Player(divId, {
@@ -166,7 +144,6 @@
               if (i !== indexInicial) event.target.pauseVideo();
               if (i === indexInicial && somAtivado) {
                 event.target.unMute();
-                fadeInVolume(event.target);
               }
             }
           }
@@ -191,14 +168,10 @@
           player.playVideo();
           if (somAtivado) {
             player.unMute();
-            fadeInVolume(player);
           }
         } else {
-          if (somAtivado) {
-            fadeOutVolume(player);
-          } else {
-            player.pauseVideo();
-          }
+          player.pauseVideo();
+          if (somAtivado) player.mute();
         }
       });
     });
@@ -210,9 +183,8 @@
       players.forEach((player, i) => {
         if (somAtivado) {
           player.unMute();
-          fadeInVolume(player);
         } else {
-          fadeOutVolume(player);
+          player.mute();
         }
       });
 
