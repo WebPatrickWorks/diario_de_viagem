@@ -24,10 +24,10 @@
     }
 
     .btn-fechar {
-      position: absolute;
+      position: fixed; /* 🔁 era absolute */
       top: 16px;
       right: 16px;
-      z-index: 10;
+      z-index: 9999; /* 🔁 era 10 */
       background-color: rgba(255, 82, 82, 0.9);
       color: white;
       border: none;
@@ -57,29 +57,32 @@
 
 <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
 
-  <script>
-    function fecharPlayer() {
-      window.opener?.postMessage('fechar-player', '*');
+<script>
+  function fecharPlayer() {
+    window.opener?.postMessage('fechar-player', '*');
+    window.history.back();
+  }
+</script>
 
-      // Tenta fechar a aba (funciona somente se esta janela foi aberta com window.open())
-      window.history.back();
-    }
-    
-  </script>  
+<iframe
+  id="player"
+  style="visibility: hidden;"
+  allow="autoplay; encrypted-media"
+  allowfullscreen
+  onload="this.style.visibility='visible'">
+</iframe>
 
-  <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const videoId = params.get('v');
-    if (videoId) {
-      document.getElementById('player').src =
-        `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`;
-    } else {
-      document.body.innerHTML =
-        '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
-    }
-  </script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const videoId = params.get('v');
+  if (videoId) {
+    document.getElementById('player').src =
+      `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`;
+  } else {
+    document.body.innerHTML =
+      '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
+  }
+</script>
 
 </body>
 </html>
