@@ -54,6 +54,10 @@
       left: 16px;
     }
 
+    #btn-scroll {
+      left: 150px;
+    }
+
     #contador-videos {
       position: fixed;
       bottom: 16px;
@@ -72,6 +76,7 @@
 <body>
   <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
   <button id="btn-som" class="btn-topo">🔊 Ativar som</button>
+  <button id="btn-scroll" class="btn-topo">🎞️ Modo TikTok</button>
   <div id="contador-videos">📹 1 / 1</div>
 
   <div id="container"></div>
@@ -83,6 +88,8 @@
     let playerDivs = [];
     let indexAtual = 0;
     let somAtivado = false;
+    let modoTikTok = true;
+    let observer;
     const contador = document.getElementById('contador-videos');
 
     const params = new URLSearchParams(window.location.search);
@@ -150,14 +157,13 @@
         });
         players.push(player);
       });
-
       scrollToIndex(indexInicial);
     }
 
     container.addEventListener('scroll', () => {
+      if (!modoTikTok) return;
       const pos = container.scrollTop;
       const index = Math.round(pos / window.innerHeight);
-
       if (index === indexAtual) return;
       indexAtual = index;
       atualizarContador();
@@ -166,9 +172,7 @@
         if (i === index) {
           player.seekTo(0, true);
           player.playVideo();
-          if (somAtivado) {
-            player.unMute();
-          }
+          if (somAtivado) player.unMute();
         } else {
           player.pauseVideo();
           if (somAtivado) player.mute();
@@ -176,10 +180,53 @@
       });
     });
 
+    function ativarInstagramMode() {
+      container.style.scrollSnapType = 'none';
+      document.querySelectorAll('.video-wrapper').forEach(el => {
+        el.style.scrollSnapAlign = 'none';
+      });
+
+      observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const index = playerDivs.findIndex(id => id === entry.target.id);
+          if (index === -1) return;
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            indexAtual = index;
+            atualizarContador();
+            players[index].playVideo();
+            if (somAtivado) players[index].unMute();
+          } else {
+            players[index].pauseVideo();
+            if (somAtivado) players[index].mute();
+          }
+        });
+      }, { threshold: 0.5 });
+
+      playerDivs.forEach(id => observer.observe(document.getElementById(id)));
+    }
+
+    function ativarTikTokMode() {
+      container.style.scrollSnapType = 'y mandatory';
+      document.querySelectorAll('.video-wrapper').forEach(el => {
+        el.style.scrollSnapAlign = 'start';
+      });
+      if (observer) observer.disconnect();
+    }
+
+    document.getElementById('btn-scroll').addEventListener('click', () => {
+      modoTikTok = !modoTikTok;
+      const btn = document.getElementById('btn-scroll');
+      btn.textContent = modoTikTok ? '🎞️ Modo TikTok' : '📱 Modo Insta';
+      if (modoTikTok) {
+        ativarTikTokMode();
+      } else {
+        ativarInstagramMode();
+      }
+    });
+
     const btnSom = document.getElementById('btn-som');
     btnSom.addEventListener('click', () => {
       somAtivado = !somAtivado;
-
       players.forEach((player, i) => {
         if (somAtivado) {
           player.unMute();
@@ -187,7 +234,6 @@
           player.mute();
         }
       });
-
       btnSom.textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
     });
 
