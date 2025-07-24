@@ -2,134 +2,127 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Assistir Vídeo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Vertical</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: black;
       overflow: hidden;
+      background: black;
     }
 
-    #player {
-      position: fixed;
-      top: 0;
-      left: 0;
+    #container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .video-wrapper {
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    iframe {
       width: 100vw;
       height: 100vh;
-      z-index: 0;
+      border: none;
     }
 
-    .btn-fechar {
+    .btn-topo {
       position: fixed;
       top: 16px;
-      right: 16px;
-      z-index: 9999;
-      background-color: rgba(255, 82, 82, 0.9);
+      z-index: 1000;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: rgba(0, 0, 0, 0.6);
       color: white;
-      border: none;
-      padding: 10px 16px;
-      font-size: 16px;
-      border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s;
     }
 
-    .btn-fechar:hover {
-      background-color: rgba(230, 50, 50, 1);
-    }
-
-    .btn-som {
-      position: fixed;
-      bottom: 16px;
+    #btn-fechar {
       right: 16px;
-      z-index: 9999;
-      background-color: rgba(82, 255, 100, 0.9);
-      color: black;
-      border: none;
-      padding: 10px 16px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s;
     }
 
-    .btn-som:hover {
-      background-color: rgba(60, 200, 80, 1);
-    }
-
-    @media (max-width: 600px) {
-      .btn-fechar, .btn-som {
-        font-size: 14px;
-        padding: 8px 14px;
-      }
-
-      .btn-fechar {
-        top: 12px;
-        right: 12px;
-      }
-
-      .btn-som {
-        bottom: 12px;
-        right: 12px;
-      }
+    #btn-som {
+      left: 16px;
     }
   </style>
 </head>
 <body>
+  <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
+  <button id="btn-som" class="btn-topo">🔊 Ativar som</button>
 
-  <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
-  <button class="btn-som" id="btnSom" onclick="ativarSom()">🔊 Ativar Som</button>
-
-  <div id="player"></div>
+  <div id="container"></div>
 
   <script>
-    function fecharPlayer() {
-      window.opener?.postMessage('fechar-player', '*');
-      window.history.back();
-    }
+    const container = document.getElementById('container');
+    const videoIds = [];
 
-    let player;
-
-    function onYouTubeIframeAPIReady() {
-      const params = new URLSearchParams(window.location.search);
-      const videoId = params.get('v');
-
-      if (!videoId) {
-        document.body.innerHTML = '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
-        return;
-      }
-
-      player = new YT.Player('player', {
-        videoId: videoId,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1
-        },
-        events: {
-          onReady: event => event.target.playVideo()
-        }
+    // 🔁 Extrai todos os videoIds do cache local
+    try {
+      const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
+      Object.values(cache).forEach(cidade => {
+        const videos = cidade.videos || [];
+        videos.forEach(url => {
+          const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
+          if (match && match[1]) videoIds.push(match[1]);
+        });
       });
+    } catch (e) {
+      console.warn('Erro ao carregar vídeos do cache:', e);
     }
 
-    function ativarSom() {
-      if (player) {
-        player.unMute();
-        player.setVolume(100);
-        // Oculta o botão após ativar o som
-        const btn = document.getElementById('btnSom');
-        if (btn) btn.style.display = 'none';
+    // 🔁 Cria um iframe por vídeo
+    videoIds.forEach((id, i) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'video-wrapper';
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${id}?autoplay=${i === 0 ? 1 : 0}&mute=1`;
+      iframe.setAttribute('allow', 'autoplay; encrypted-media');
+      iframe.setAttribute('allowfullscreen', '');
+
+      wrapper.appendChild(iframe);
+      container.appendChild(wrapper);
+    });
+
+    // 🔁 Alterna autoplay entre vídeos visíveis
+    container.addEventListener('scroll', () => {
+      const scrollTop = container.scrollTop;
+      const index = Math.round(scrollTop / window.innerHeight);
+
+      container.querySelectorAll('iframe').forEach((iframe, i) => {
+        const id = videoIds[i];
+        const autoplay = i === index ? 1 : 0;
+        iframe.src = `https://www.youtube.com/embed/${id}?autoplay=${autoplay}&mute=1`;
+      });
+    });
+
+    // 🔁 Botão fechar
+    document.getElementById('btn-fechar').addEventListener('click', () => {
+      window.opener?.postMessage('fechar-player', '*');
+    });
+
+    // 🔊 Ativar som
+    document.getElementById('btn-som').addEventListener('click', () => {
+      const scrollTop = container.scrollTop;
+      const index = Math.round(scrollTop / window.innerHeight);
+      const iframes = container.querySelectorAll('iframe');
+
+      if (iframes[index]) {
+        const id = videoIds[index];
+        iframes[index].src = `https://www.youtube.com/embed/${id}?autoplay=1`;
       }
-    }
+    });
   </script>
-
-  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
