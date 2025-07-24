@@ -69,7 +69,6 @@
     let playerDivs = [];
     let indexAtual = 0;
 
-    // 🔁 Extrai vídeos do cache local
     try {
       const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
       Object.values(cache).forEach(cidade => {
@@ -83,7 +82,6 @@
       console.warn('Erro ao carregar cache:', e);
     }
 
-    // 🔁 Cria estrutura HTML dos players
     videoIds.forEach((id, i) => {
       const wrapper = document.createElement('div');
       wrapper.className = 'video-wrapper';
@@ -97,7 +95,6 @@
       playerDivs.push(div.id);
     });
 
-    // 🎯 API do YouTube vai chamar essa função automaticamente
     function onYouTubeIframeAPIReady() {
       playerDivs.forEach((divId, i) => {
         const player = new YT.Player(divId, {
@@ -117,7 +114,6 @@
       });
     }
 
-    // 📦 Scroll handler
     container.addEventListener('scroll', () => {
       const pos = container.scrollTop;
       const index = Math.round(pos / window.innerHeight);
@@ -134,7 +130,6 @@
       });
     });
 
-    // 🔊 Botão de ativar som
     document.getElementById('btn-som').addEventListener('click', () => {
       const atual = players[indexAtual];
       if (atual && typeof atual.unMute === 'function') {
@@ -142,9 +137,15 @@
       }
     });
 
-    // ✖ Botão de fechar
     document.getElementById('btn-fechar').addEventListener('click', () => {
-      window.opener?.postMessage('fechar-player', '*');
+      try {
+        window.opener?.postMessage('fechar-player', '*');
+        window.parent?.postMessage('fechar-player', '*');
+        window.top?.postMessage('fechar-player', '*');
+      } catch (e) {
+        console.warn('❌ postMessage falhou', e);
+      }
+      window.close();
     });
   </script>
 </body>
