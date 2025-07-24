@@ -26,13 +26,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
 
-    iframe {
+    .player-container {
       width: 100vw;
       height: 100vh;
-      border: none;
     }
 
     .btn-topo {
@@ -56,6 +54,7 @@
       left: 16px;
     }
   </style>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
   <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
@@ -66,8 +65,11 @@
   <script>
     const container = document.getElementById('container');
     const videoIds = [];
+    const players = [];
+    let playerDivs = [];
+    let indexAtual = 0;
 
-    // 🔁 Extrai todos os videoIds do cache local
+    // 🔁 Extrai vídeos do cache local
     try {
       const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
       Object.values(cache).forEach(cidade => {
@@ -78,50 +80,71 @@
         });
       });
     } catch (e) {
-      console.warn('Erro ao carregar vídeos do cache:', e);
+      console.warn('Erro ao carregar cache:', e);
     }
 
-    // 🔁 Cria um iframe por vídeo
+    // 🔁 Cria estrutura HTML dos players
     videoIds.forEach((id, i) => {
       const wrapper = document.createElement('div');
       wrapper.className = 'video-wrapper';
 
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${id}?autoplay=${i === 0 ? 1 : 0}&mute=1`;
-      iframe.setAttribute('allow', 'autoplay; encrypted-media');
-      iframe.setAttribute('allowfullscreen', '');
+      const div = document.createElement('div');
+      div.id = `player-${i}`;
+      div.className = 'player-container';
 
-      wrapper.appendChild(iframe);
+      wrapper.appendChild(div);
       container.appendChild(wrapper);
+      playerDivs.push(div.id);
     });
 
-    // 🔁 Alterna autoplay entre vídeos visíveis
-    container.addEventListener('scroll', () => {
-      const scrollTop = container.scrollTop;
-      const index = Math.round(scrollTop / window.innerHeight);
+    // 🎯 API do YouTube vai chamar essa função automaticamente
+    function onYouTubeIframeAPIReady() {
+      playerDivs.forEach((divId, i) => {
+        const player = new YT.Player(divId, {
+          videoId: videoIds[i],
+          playerVars: {
+            autoplay: i === 0 ? 1 : 0,
+            mute: 1,
+            playsinline: 1
+          },
+          events: {
+            onReady: (event) => {
+              if (i !== 0) event.target.pauseVideo();
+            }
+          }
+        });
+        players.push(player);
+      });
+    }
 
-      container.querySelectorAll('iframe').forEach((iframe, i) => {
-        const id = videoIds[i];
-        const autoplay = i === index ? 1 : 0;
-        iframe.src = `https://www.youtube.com/embed/${id}?autoplay=${autoplay}&mute=1`;
+    // 📦 Scroll handler
+    container.addEventListener('scroll', () => {
+      const pos = container.scrollTop;
+      const index = Math.round(pos / window.innerHeight);
+
+      if (index === indexAtual) return;
+      indexAtual = index;
+
+      players.forEach((player, i) => {
+        if (i === index) {
+          player.playVideo();
+        } else {
+          player.pauseVideo();
+        }
       });
     });
 
-    // 🔁 Botão fechar
-    document.getElementById('btn-fechar').addEventListener('click', () => {
-      window.opener?.postMessage('fechar-player', '*');
+    // 🔊 Botão de ativar som
+    document.getElementById('btn-som').addEventListener('click', () => {
+      const atual = players[indexAtual];
+      if (atual && typeof atual.unMute === 'function') {
+        atual.unMute();
+      }
     });
 
-    // 🔊 Ativar som
-    document.getElementById('btn-som').addEventListener('click', () => {
-      const scrollTop = container.scrollTop;
-      const index = Math.round(scrollTop / window.innerHeight);
-      const iframes = container.querySelectorAll('iframe');
-
-      if (iframes[index]) {
-        const id = videoIds[index];
-        iframes[index].src = `https://www.youtube.com/embed/${id}?autoplay=1`;
-      }
+    // ✖ Botão de fechar
+    document.getElementById('btn-fechar').addEventListener('click', () => {
+      window.opener?.postMessage('fechar-player', '*');
     });
   </script>
 </body>
