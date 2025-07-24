@@ -68,6 +68,7 @@
     const players = [];
     let playerDivs = [];
     let indexAtual = 0;
+    let somAtivado = false;
 
     try {
       const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
@@ -124,17 +125,27 @@
       players.forEach((player, i) => {
         if (i === index) {
           player.playVideo();
+          if (somAtivado) player.unMute();
         } else {
           player.pauseVideo();
+          if (somAtivado) player.mute();
         }
       });
     });
 
-    document.getElementById('btn-som').addEventListener('click', () => {
-      const atual = players[indexAtual];
-      if (atual && typeof atual.unMute === 'function') {
-        atual.unMute();
-      }
+    const btnSom = document.getElementById('btn-som');
+    btnSom.addEventListener('click', () => {
+      somAtivado = !somAtivado;
+
+      players.forEach((player, i) => {
+        if (somAtivado) {
+          player.unMute();
+        } else {
+          player.mute();
+        }
+      });
+
+      btnSom.textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
     });
 
     document.getElementById('btn-fechar').addEventListener('click', () => {
