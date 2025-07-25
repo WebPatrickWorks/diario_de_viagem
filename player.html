@@ -98,7 +98,11 @@
         const videos = cidade.videos || [];
         videos.forEach(url => {
           const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
-          if (match && match[1]) midias.push({ tipo: 'video', id: match[1] });
+          if (match && match[1]) {
+            midias.push({ tipo: 'video', id: match[1] });
+          } else {
+            console.warn('Link de vídeo inválido:', url);
+          }
         });
       });
     } catch (e) {
@@ -107,20 +111,24 @@
 
     function renderizarMidias() {
       container.innerHTML = '';
-      midias.forEach((m, i) => {
+      let playerIndex = 0;
+      midias.forEach((m) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'item-wrapper';
-        const el = document.createElement(m.tipo === 'foto' ? 'img' : 'div');
 
         if (m.tipo === 'foto') {
+          const el = document.createElement('img');
           el.src = m.url;
           el.className = 'foto-container';
+          wrapper.appendChild(el);
         } else {
-          el.id = `player-${players.length}`;
+          const el = document.createElement('div');
+          el.id = `player-${playerIndex}`;
           el.className = 'player-container';
+          wrapper.appendChild(el);
+          playerIndex++;
         }
 
-        wrapper.appendChild(el);
         container.appendChild(wrapper);
       });
     }
@@ -128,10 +136,11 @@
     renderizarMidias();
 
     function onYouTubeIframeAPIReady() {
+      let playerIndex = 0;
       midias.forEach((m, i) => {
         if (m.tipo !== 'video') return;
 
-        const player = new YT.Player(`player-${players.length}`, {
+        const player = new YT.Player(`player-${playerIndex}`, {
           videoId: m.id,
           playerVars: {
             autoplay: i === indexInicial ? 1 : 0,
@@ -146,6 +155,7 @@
           }
         });
         players.push(player);
+        playerIndex++;
       });
     }
 
@@ -162,8 +172,8 @@
       atualizarContador();
 
       players.forEach((player, i) => {
-        const idx = midias.findIndex(m => m.tipo === 'video' && `player-${i}` === `player-${i}`);
-        if (idx === index) {
+        const midiaIndex = midias.findIndex((m, idx) => m.tipo === 'video' && idx === index);
+        if (midiaIndex === index) {
           player.seekTo(0, true);
           player.playVideo();
           if (somAtivado) player.unMute();
