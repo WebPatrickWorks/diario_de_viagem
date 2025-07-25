@@ -13,6 +13,16 @@
       background: black;
     }
 
+    #logo-player {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      width: 56px; /* ou outro tamanho */
+      height: auto;
+      z-index: 1000;
+      opacity: 0.95;
+    }
+
     #container {
       height: 100vh;
       overflow-y: scroll;
@@ -248,5 +258,6 @@
       window.close();
     });
   </script>
+  <img id="logo-player" src="icons/logo-transpa.png" alt="Logo Diário de Viagem">
 </body>
 </html>

@@ -52017,7 +52017,7 @@ r=t.z
 return A.aP8(new A.awP(s),A.m1(B.f2,null,r),r)}}
 A.awP.prototype={
 $2(a,b){var s=null
-if(b.a!==B.jg)return A.Wi(s,B.p,A.hf(A.aV8("lib/assets/icons/pessoa.png",s,200),s,s),s,s)
+if(b.a!==B.jg)return A.Wi(s,B.p,A.hf(A.aV8("lib/assets/icons/logo-transpa.png",s,200),s,s),s,s)
 return this.a==null?B.nW:B.oX},
 $S:573}
 A.afO.prototype={
@@ -126976,7 +126976,7 @@ B.Km=new A.aF("Selecionar da galeria",null,null,null,null,null,null,null,null)
 B.aGE=new A.aF("Confirmar exclus\xe3o",null,null,null,null,null,null,null,null)
 B.aGF=new A.aF("Recalcular Rota",null,null,null,null,null,null,null,null)
 B.aGH=new A.aF("Criar nova conta",null,null,null,null,null,null,null,null)
-B.aGI=new A.aF("1.2.44",null,null,null,null,null,null,null,null)
+B.aGI=new A.aF("1.2.45",null,null,null,null,null,null,null,null)
 B.aGJ=new A.aF("Confirmar",null,null,null,null,null,null,null,null)
 B.aGK=new A.aF("Nome da Viagem",null,B.h0,B.cK,null,null,null,null,null)
 B.aGM=new A.aF("\ud83c\udf9e\ufe0f Confirmar v\xeddeo",null,null,null,null,null,null,null,null)
