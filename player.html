@@ -85,6 +85,7 @@
     const contador = document.getElementById('contador-videos');
     const videoIds = [];
     let players = {};
+    let isPlayerReady = {};
     let indexAtual = 0;
     let somAtivado = false;
 
@@ -127,17 +128,21 @@
     }
 
     function criarPlayer(i) {
-      const divId = `player-${i}`;
-      if (players[i]) return;
+      return new Promise(resolve => {
+        if (players[i]) return resolve(); // já existe
 
-      players[i] = new YT.Player(divId, {
-        videoId: videoIds[i],
-        playerVars: { autoplay: 1, mute: !somAtivado ? 1 : 0, playsinline: 1 },
-        events: {
-          onReady: (event) => {
-            if (i !== indexAtual) event.target.pauseVideo();
+        const divId = `player-${i}`;
+        players[i] = new YT.Player(divId, {
+          videoId: videoIds[i],
+          playerVars: { autoplay: i === indexAtual ? 1 : 0, mute: !somAtivado ? 1 : 0, playsinline: 1 },
+          events: {
+            onReady: event => {
+              isPlayerReady[i] = true;
+              if (i !== indexAtual) event.target.pauseVideo();
+              resolve();
+            }
           }
-        }
+        });
       });
     }
 
@@ -145,57 +150,63 @@
       if (players[i]) {
         players[i].destroy();
         delete players[i];
+        delete isPlayerReady[i];
       }
     }
 
-    function manterApenas(i) {
+    async function manterApenas(i) {
       const ativos = [i - 1, i, i + 1];
+      await Promise.all(ativos.map(async j => {
+        if (j >= 0 && j < videoIds.length) await criarPlayer(j);
+      }));
       for (let j = 0; j < videoIds.length; j++) {
-        if (ativos.includes(j)) {
-          criarPlayer(j);
-        } else {
-          destruirPlayer(j);
-        }
+        if (!ativos.includes(j)) destruirPlayer(j);
       }
     }
 
-    function scrollToIndex(i) {
-      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
+    async function scrollToIndex(i) {
       indexAtual = i;
       atualizarContador();
-      manterApenas(i);
+      await manterApenas(i);
+      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
+
+      if (players[i] && isPlayerReady[i]) {
+        players[i].playVideo();
+        if (somAtivado) players[i].unMute();
+      }
     }
 
-    window.onYouTubeIframeAPIReady = () => {
-      manterApenas(indexInicial);
-      scrollToIndex(indexInicial);
+    window.onYouTubeIframeAPIReady = async () => {
+      await manterApenas(indexInicial);
+      await scrollToIndex(indexInicial);
     };
 
-    container.addEventListener('scroll', () => {
+    container.addEventListener('scroll', async () => {
       const pos = container.scrollTop;
       const i = Math.round(pos / window.innerHeight);
       if (i === indexAtual) return;
 
       indexAtual = i;
       atualizarContador();
-      manterApenas(i);
+      await manterApenas(i);
 
-      Object.entries(players).forEach(([idx, player]) => {
-        const index = parseInt(idx);
-        if (index === i) {
+      for (const [idxStr, player] of Object.entries(players)) {
+        const idx = parseInt(idxStr);
+        if (idx === i && isPlayerReady[idx]) {
           player.playVideo();
           if (somAtivado) player.unMute();
-        } else {
+        } else if (isPlayerReady[idx]) {
           player.pauseVideo();
           player.mute();
         }
-      });
+      }
     });
 
     document.getElementById('btn-som').addEventListener('click', () => {
       somAtivado = !somAtivado;
-      Object.values(players).forEach(player => {
-        somAtivado ? player.unMute() : player.mute();
+      Object.entries(players).forEach(([_, player]) => {
+        if (somAtivado) player.unMute();
+        else player.mute();
       });
       document.getElementById('btn-som').textContent = somAtivado ? '🔊 som' : '🔇 som';
     });
