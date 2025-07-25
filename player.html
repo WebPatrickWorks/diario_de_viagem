@@ -170,9 +170,12 @@
 
       mapaPlayers.forEach((player, idx) => {
         if (idx === index) {
-          player.seekTo(0, true);
-          player.playVideo();
-          if (somAtivado) player.unMute();
+          player.pauseVideo();
+          setTimeout(() => {
+            player.seekTo(0, true);
+            player.playVideo();
+            if (somAtivado) player.unMute();
+          }, 300); // pequeno delay ajuda a garantir o seek
         } else {
           player.pauseVideo();
           player.mute();
@@ -197,8 +200,12 @@
             if (midias[index].tipo === 'video') {
               const player = mapaPlayers.get(index);
               if (player) {
-                player.playVideo();
-                if (somAtivado) player.unMute();
+                player.pauseVideo();
+                setTimeout(() => {
+                  player.seekTo(0, true);
+                  player.playVideo();
+                  if (somAtivado) player.unMute();
+                }, 300);
               }
             }
           } else {
