@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#000000">
-  <title>Player Vertical</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Otimizado</title>
   <style>
     html, body {
       margin: 0;
@@ -12,16 +11,6 @@
       height: 100%;
       overflow: hidden;
       background: black;
-    }
-
-    #logo-player {
-      position: fixed;
-      bottom: 16px;
-      left: 16px;
-      width: 56px; /* ou outro tamanho */
-      height: auto;
-      z-index: 1000;
-      opacity: 0.95;
     }
 
     #container {
@@ -57,17 +46,9 @@
       cursor: pointer;
     }
 
-    #btn-fechar {
-      right: 16px;
-    }
-
-    #btn-som {
-      left: 16px;
-    }
-
-    #btn-scroll {
-      left: 100px;
-    }
+    #btn-fechar { right: 16px; }
+    #btn-som { left: 16px; }
+    #btn-scroll { left: 100px; }
 
     #contador-videos {
       position: fixed;
@@ -81,27 +62,35 @@
       border-radius: 6px;
       font-family: sans-serif;
     }
+
+    #logo-player {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      width: 56px;
+      z-index: 1000;
+      opacity: 0.95;
+    }
   </style>
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
-<body style="background-color: black;">
+<body>
   <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
   <button id="btn-som" class="btn-topo">🔇 som</button>
   <button id="btn-scroll" class="btn-topo">Modo Tik</button>
   <div id="contador-videos">📹 1 / 1</div>
-
   <div id="container"></div>
+  <img id="logo-player" src="icons/logo-transpa.png" alt="Logo Diário de Viagem" />
 
   <script>
     const container = document.getElementById('container');
+    const contador = document.getElementById('contador-videos');
     const videoIds = [];
-    const players = [];
-    let playerDivs = [];
+    let players = {};
     let indexAtual = 0;
     let somAtivado = false;
     let modoTikTok = true;
     let observer;
-    const contador = document.getElementById('contador-videos');
 
     const params = new URLSearchParams(window.location.search);
     const videoInicial = params.get('v');
@@ -125,7 +114,7 @@
       if (foundIndex >= 0) indexInicial = foundIndex;
     }
 
-    videoIds.forEach((id, i) => {
+    videoIds.forEach((_, i) => {
       const wrapper = document.createElement('div');
       wrapper.className = 'video-wrapper';
 
@@ -135,61 +124,44 @@
 
       wrapper.appendChild(div);
       container.appendChild(wrapper);
-      playerDivs.push(div.id);
     });
-
-    function scrollToIndex(i) {
-      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
-      indexAtual = i;
-      atualizarContador();
-    }
 
     function atualizarContador() {
       contador.textContent = `📹 ${indexAtual + 1} / ${videoIds.length}`;
     }
 
-    function onYouTubeIframeAPIReady() {
-      playerDivs.forEach((divId, i) => {
-        const player = new YT.Player(divId, {
-          videoId: videoIds[i],
-          playerVars: {
-            autoplay: i === indexInicial ? 1 : 0,
-            mute: 1,
-            playsinline: 1
-          },
-          events: {
-            onReady: (event) => {
-              if (i !== indexInicial) event.target.pauseVideo();
-              if (i === indexInicial && somAtivado) {
-                event.target.unMute();
-              }
-            }
+    function criarPlayer(i) {
+      const divId = `player-${i}`;
+      if (players[i]) return;
+
+      players[i] = new YT.Player(divId, {
+        videoId: videoIds[i],
+        playerVars: { autoplay: i === indexAtual ? 1 : 0, mute: !somAtivado ? 1 : 0, playsinline: 1 },
+        events: {
+          onReady: (event) => {
+            if (i !== indexAtual) event.target.pauseVideo();
           }
-        });
-        players.push(player);
-      });
-      scrollToIndex(indexInicial);
-    }
-
-    container.addEventListener('scroll', () => {
-      if (!modoTikTok) return;
-      const pos = container.scrollTop;
-      const index = Math.round(pos / window.innerHeight);
-      if (index === indexAtual) return;
-      indexAtual = index;
-      atualizarContador();
-
-      players.forEach((player, i) => {
-        if (i === index) {
-          player.seekTo(0, true);
-          player.playVideo();
-          if (somAtivado) player.unMute();
-        } else {
-          player.pauseVideo();
-          if (somAtivado) player.mute();
         }
       });
-    });
+    }
+
+    function destruirPlayer(i) {
+      if (players[i]) {
+        players[i].destroy();
+        delete players[i];
+      }
+    }
+
+    function manterApenas(i) {
+      const ativos = [i - 1, i, i + 1];
+      for (let j = 0; j < videoIds.length; j++) {
+        if (ativos.includes(j)) {
+          criarPlayer(j);
+        } else {
+          destruirPlayer(j);
+        }
+      }
+    }
 
     function ativarInstagramMode() {
       container.style.scrollSnapType = 'none';
@@ -199,21 +171,25 @@
 
       observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-          const index = playerDivs.findIndex(id => id === entry.target.id);
-          if (index === -1) return;
+          const i = parseInt(entry.target.firstChild.id.split('-')[1]);
           if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            indexAtual = index;
+            indexAtual = i;
             atualizarContador();
-            players[index].playVideo();
-            if (somAtivado) players[index].unMute();
+            manterApenas(i);
+            if (players[i]) {
+              players[i].playVideo();
+              if (somAtivado) players[i].unMute();
+            }
           } else {
-            players[index].pauseVideo();
-            if (somAtivado) players[index].mute();
+            if (players[i]) {
+              players[i].pauseVideo();
+              if (somAtivado) players[i].mute();
+            }
           }
         });
       }, { threshold: 0.5 });
 
-      playerDivs.forEach(id => observer.observe(document.getElementById(id)));
+      document.querySelectorAll('.player-container').forEach(el => observer.observe(el));
     }
 
     function ativarTikTokMode() {
@@ -224,28 +200,54 @@
       if (observer) observer.disconnect();
     }
 
+    function scrollToIndex(i) {
+      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
+      indexAtual = i;
+      atualizarContador();
+      manterApenas(i);
+    }
+
+    window.onYouTubeIframeAPIReady = () => {
+      manterApenas(indexInicial);
+      scrollToIndex(indexInicial);
+    };
+
+    container.addEventListener('scroll', () => {
+      if (!modoTikTok) return;
+      const pos = container.scrollTop;
+      const i = Math.round(pos / window.innerHeight);
+      if (i === indexAtual) return;
+
+      indexAtual = i;
+      atualizarContador();
+      manterApenas(i);
+
+      Object.entries(players).forEach(([idx, player]) => {
+        const index = parseInt(idx);
+        if (index === i) {
+          player.playVideo();
+          if (somAtivado) player.unMute();
+        } else {
+          player.pauseVideo();
+          if (somAtivado) player.mute();
+        }
+      });
+    });
+
     document.getElementById('btn-scroll').addEventListener('click', () => {
       modoTikTok = !modoTikTok;
       const btn = document.getElementById('btn-scroll');
       btn.textContent = modoTikTok ? 'Modo Tik' : 'Modo Insta';
-      if (modoTikTok) {
-        ativarTikTokMode();
-      } else {
-        ativarInstagramMode();
-      }
+      if (modoTikTok) ativarTikTokMode();
+      else ativarInstagramMode();
     });
 
-    const btnSom = document.getElementById('btn-som');
-    btnSom.addEventListener('click', () => {
+    document.getElementById('btn-som').addEventListener('click', () => {
       somAtivado = !somAtivado;
-      players.forEach((player, i) => {
-        if (somAtivado) {
-          player.unMute();
-        } else {
-          player.mute();
-        }
+      Object.values(players).forEach(player => {
+        somAtivado ? player.unMute() : player.mute();
       });
-      btnSom.textContent = somAtivado ? '🔊 som' : '🔇 som';
+      document.getElementById('btn-som').textContent = somAtivado ? '🔊 som' : '🔇 som';
     });
 
     document.getElementById('btn-fechar').addEventListener('click', () => {
@@ -259,6 +261,5 @@
       window.close();
     });
   </script>
-  <img id="logo-player" src="icons/logo-transpa.png" alt="Logo Diário de Viagem">
 </body>
 </html>
