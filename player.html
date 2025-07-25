@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Rolagem Controlada V3</title>
+  <title>Player Rolagem Controlada V4</title>
   <style>
     html, body {
       margin: 0;
@@ -50,8 +50,8 @@
 
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
-    #btn-baixo { bottom: 50%; right: 20px; transform: translateY(50%); }
-    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); }
+    #btn-baixo { bottom: 50%; right: 20px; transform: translateY(50%); display: none; }
+    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); display: none; }
   </style>
 </head>
 <body>
@@ -94,11 +94,15 @@
     }
 
     function atualizarSetas() {
-      document.getElementById('btn-cima').style.display = currentIndex > 0 ? 'block' : 'none';
-      document.getElementById('btn-baixo').style.display = currentIndex < videoIds.length - 1 ? 'block' : 'none';
+      const btnCima = document.getElementById('btn-cima');
+      const btnBaixo = document.getElementById('btn-baixo');
+      btnCima.style.display = currentIndex > 0 ? 'block' : 'none';
+      btnBaixo.style.display = currentIndex < videoIds.length - 1 ? 'block' : 'none';
     }
 
     function carregarVideoAtual() {
+      atualizarSetas(); // Corrigido: chama ANTES de limpar ou carregar
+
       const container = document.getElementById('container');
       container.innerHTML = '';
       const wrapper = document.createElement('div');
@@ -110,7 +114,6 @@
       container.appendChild(wrapper);
 
       carregando = true;
-      atualizarSetas(); // ✅ atualiza ANTES de carregar o novo vídeo
 
       if (!somAtivado) {
         document.getElementById('btn-som').style.display = 'block';
@@ -127,6 +130,7 @@
               document.getElementById('btn-som').style.display = 'none';
             }
             carregando = false;
+            atualizarSetas(); // também após onReady para garantir
           }
         }
       });
