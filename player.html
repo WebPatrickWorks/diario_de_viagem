@@ -129,16 +129,18 @@
 
     function criarPlayer(i) {
       return new Promise(resolve => {
-        if (players[i]) return resolve(); // já existe
+        if (players[i]) return resolve();
 
         const divId = `player-${i}`;
         players[i] = new YT.Player(divId, {
           videoId: videoIds[i],
-          playerVars: { autoplay: i === indexAtual ? 1 : 0, mute: !somAtivado ? 1 : 0, playsinline: 1 },
+          playerVars: { autoplay: 1, mute: 1, playsinline: 1 }, // autoplay só com mute
           events: {
             onReady: event => {
               isPlayerReady[i] = true;
-              if (i !== indexAtual) event.target.pauseVideo();
+              if (i !== indexAtual) {
+                try { event.target.pauseVideo(); } catch (_) {}
+              }
               resolve();
             }
           }
@@ -155,10 +157,8 @@
     }
 
     async function manterApenas(i) {
-      const ativos = [i - 1, i, i + 1];
-      await Promise.all(ativos.map(async j => {
-        if (j >= 0 && j < videoIds.length) await criarPlayer(j);
-      }));
+      const ativos = [i - 1, i, i + 1].filter(j => j >= 0 && j < videoIds.length);
+      await Promise.all(ativos.map(j => criarPlayer(j)));
       for (let j = 0; j < videoIds.length; j++) {
         if (!ativos.includes(j)) destruirPlayer(j);
       }
@@ -169,10 +169,18 @@
       atualizarContador();
       await manterApenas(i);
       container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
+      tocarVideo(i);
+    }
 
-      if (players[i] && isPlayerReady[i]) {
-        players[i].playVideo();
-        if (somAtivado) players[i].unMute();
+    async function tocarVideo(i) {
+      const player = players[i];
+      if (player && isPlayerReady[i]) {
+        try {
+          await player.playVideo();
+          if (somAtivado) player.unMute();
+        } catch (e) {
+          console.warn('Erro ao tocar vídeo:', e);
+        }
       }
     }
 
@@ -182,31 +190,37 @@
     };
 
     container.addEventListener('scroll', async () => {
-      const pos = container.scrollTop;
-      const i = Math.round(pos / window.innerHeight);
+      const i = Math.round(container.scrollTop / window.innerHeight);
       if (i === indexAtual) return;
 
       indexAtual = i;
       atualizarContador();
       await manterApenas(i);
 
-      for (const [idxStr, player] of Object.entries(players)) {
+      Object.entries(players).forEach(([idxStr, player]) => {
         const idx = parseInt(idxStr);
-        if (idx === i && isPlayerReady[idx]) {
-          player.playVideo();
-          if (somAtivado) player.unMute();
-        } else if (isPlayerReady[idx]) {
-          player.pauseVideo();
-          player.mute();
+        if (!isPlayerReady[idx]) return;
+
+        if (idx === i) {
+          try {
+            player.playVideo();
+            if (somAtivado) player.unMute();
+          } catch (e) {}
+        } else {
+          try {
+            player.pauseVideo();
+            player.mute();
+          } catch (e) {}
         }
-      }
+      });
     });
 
     document.getElementById('btn-som').addEventListener('click', () => {
       somAtivado = !somAtivado;
       Object.entries(players).forEach(([_, player]) => {
-        if (somAtivado) player.unMute();
-        else player.mute();
+        try {
+          somAtivado ? player.unMute() : player.mute();
+        } catch (_) {}
       });
       document.getElementById('btn-som').textContent = somAtivado ? '🔊 som' : '🔇 som';
     });
@@ -216,9 +230,7 @@
         window.opener?.postMessage('fechar-player', '*');
         window.parent?.postMessage('fechar-player', '*');
         window.top?.postMessage('fechar-player', '*');
-      } catch (e) {
-        console.warn('❌ postMessage falhou', e);
-      }
+      } catch (e) {}
       window.close();
     });
   </script>
