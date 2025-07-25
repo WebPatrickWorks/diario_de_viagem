@@ -1,94 +1,76 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Scroll Leve</title>
+  <title>Player Rolagem Controlada</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: black;
+      background: black;
       overflow: hidden;
     }
 
     #container {
       height: 100vh;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .video-wrapper {
-      height: 100vh;
-      scroll-snap-align: start;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
       position: relative;
     }
 
-    iframe {
+    .video-wrapper {
       width: 100vw;
       height: 100vh;
-      border: none;
-    }
-
-    .btn-som {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       position: absolute;
-      bottom: 16px;
-      right: 16px;
-      background-color: rgba(82, 255, 100, 0.9);
-      color: black;
-      border: none;
-      padding: 10px 16px;
-      font-size: 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      z-index: 10;
+      top: 0;
+      left: 0;
     }
 
-    .btn-som:hover {
-      background-color: rgba(60, 200, 80, 1);
-    }
-
-    .btn-fechar {
+    .btn {
       position: fixed;
-      top: 16px;
-      right: 16px;
       z-index: 9999;
-      background-color: rgba(255, 82, 82, 0.9);
-      color: white;
+      padding: 10px 14px;
       border: none;
-      padding: 10px 16px;
+      border-radius: 6px;
       font-size: 14px;
-      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
       cursor: pointer;
     }
+
+    #btn-fechar { top: 16px; right: 16px; }
+    #btn-som { bottom: 16px; right: 16px; }
+    #btn-baixo { bottom: 50%; right: 20px; transform: translateY(50%); }
+    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); }
   </style>
 </head>
 <body>
-
-  <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
-
   <div id="container"></div>
+  <button id="btn-fechar" class="btn" onclick="fecharPlayer()">✖ Fechar</button>
+  <button id="btn-som" class="btn" onclick="ativarSom()">🔊 Ativar Som</button>
+  <button id="btn-cima" class="btn" onclick="trocarVideo(-1)">⬆</button>
+  <button id="btn-baixo" class="btn" onclick="trocarVideo(1)">⬇</button>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    const container = document.getElementById('container');
     const videoIds = [];
-    const players = [];
+    let player;
+    let currentIndex = 0;
+    let somAtivado = false;
+    let carregando = false;
 
     const params = new URLSearchParams(window.location.search);
     const videoInicial = params.get('v');
-    let indexInicial = 0;
 
     try {
       const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
       Object.values(cache).forEach(cidade => {
-        const videos = cidade.videos || [];
-        videos.forEach(url => {
+        (cidade.videos || []).forEach(url => {
           const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
           if (match && match[1]) videoIds.push(match[1]);
         });
@@ -98,45 +80,51 @@
     }
 
     if (videoInicial) {
-      const foundIndex = videoIds.findIndex(id => id === videoInicial);
-      if (foundIndex >= 0) indexInicial = foundIndex;
+      const found = videoIds.findIndex(id => id === videoInicial);
+      if (found >= 0) currentIndex = found;
     }
 
-    function criarIframe(videoId) {
+    function onYouTubeIframeAPIReady() {
+      carregarVideoAtual();
+    }
+
+    function carregarVideoAtual() {
+      const container = document.getElementById('container');
+      container.innerHTML = '';
       const wrapper = document.createElement('div');
       wrapper.className = 'video-wrapper';
+      wrapper.id = 'video-wrapper';
+      const div = document.createElement('div');
+      div.id = 'player';
+      wrapper.appendChild(div);
+      container.appendChild(wrapper);
 
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`;
-      iframe.allow = 'autoplay; encrypted-media; fullscreen';
-      wrapper.appendChild(iframe);
-
-      const botaoSom = document.createElement('button');
-      botaoSom.className = 'btn-som';
-      botaoSom.textContent = '🔊 Ativar som';
-      botaoSom.onclick = () => {
-        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-        botaoSom.style.display = 'none';
-      };
-
-      wrapper.appendChild(botaoSom);
-      return wrapper;
+      carregando = true;
+      player = new YT.Player('player', {
+        videoId: videoIds[currentIndex],
+        playerVars: { autoplay: 1, mute: 1, playsinline: 1 },
+        events: {
+          onReady: () => {
+            player.playVideo();
+            if (somAtivado) player.unMute();
+            carregando = false;
+          }
+        }
+      });
     }
 
-    function inicializar() {
-      const start = Math.max(0, indexInicial - 1);
-      const end = Math.min(videoIds.length, indexInicial + 2);
+    function trocarVideo(direcao) {
+      if (carregando) return;
+      const novoIndex = currentIndex + direcao;
+      if (novoIndex < 0 || novoIndex >= videoIds.length) return;
+      currentIndex = novoIndex;
+      carregarVideoAtual();
+    }
 
-      for (let i = start; i < end; i++) {
-        const el = criarIframe(videoIds[i]);
-        container.appendChild(el);
-        players.push(el);
-      }
-
-      // Scroll inicial
-      requestAnimationFrame(() => {
-        container.scrollTo({ top: (indexInicial - start) * window.innerHeight });
-      });
+    function ativarSom() {
+      somAtivado = true;
+      if (player && player.unMute) player.unMute();
+      document.getElementById('btn-som').style.display = 'none';
     }
 
     function fecharPlayer() {
@@ -144,12 +132,9 @@
         window.opener?.postMessage('fechar-player', '*');
         window.parent?.postMessage('fechar-player', '*');
         window.top?.postMessage('fechar-player', '*');
-      } catch (e) {}
+      } catch (_) {}
       window.close();
     }
-
-    inicializar();
   </script>
-
 </body>
 </html>
