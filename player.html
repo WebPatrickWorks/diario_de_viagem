@@ -50,7 +50,6 @@
     #btn-fechar { right: 16px; }
     #btn-som { left: 16px; }
     #btn-scroll { left: 150px; }
-    #btn-modo { left: 300px; }
 
     #contador-videos {
       position: fixed;
@@ -71,7 +70,6 @@
   <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
   <button id="btn-som" class="btn-topo">🔊 Ativar som</button>
   <button id="btn-scroll" class="btn-topo">🎞️ Modo TikTok</button>
-  <button id="btn-modo" class="btn-topo">📷 Modo: Todos</button>
   <div id="contador-videos">📹 1 / 1</div>
 
   <div id="container"></div>
@@ -82,7 +80,6 @@
     let indexAtual = 0;
     let somAtivado = false;
     let modoTikTok = true;
-    let modoAtual = 'todos';
     let observer;
 
     const contador = document.getElementById('contador-videos');
@@ -226,7 +223,7 @@
     document.getElementById('btn-scroll').addEventListener('click', () => {
       modoTikTok = !modoTikTok;
       const btn = document.getElementById('btn-scroll');
-      btn.textContent = modoTikTok ? 'Modo Tik' : 'Modo Insta';
+      btn.textContent = modoTikTok ? '🎞️ Modo TikTok' : '📱 Modo Insta';
       modoTikTok ? ativarTikTokMode() : ativarInstagramMode();
     });
 
@@ -234,13 +231,6 @@
       somAtivado = !somAtivado;
       players.forEach(player => somAtivado ? player.unMute() : player.mute());
       document.getElementById('btn-som').textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
-    });
-
-    document.getElementById('btn-modo').addEventListener('click', () => {
-      modoAtual = modoAtual === 'todos' ? 'videos' : (modoAtual === 'videos' ? 'fotos' : 'todos');
-      const label = modoAtual === 'todos' ? '📷 Modo: Todos' : modoAtual === 'videos' ? '🎬 Modo: Vídeos' : '🖼️ Modo: Fotos';
-      document.getElementById('btn-modo').textContent = label;
-      // Aqui você poderia aplicar filtros no array de midias se quiser alternar o conteúdo, mantivemos todos por enquanto.
     });
 
     document.getElementById('btn-fechar').addEventListener('click', () => {
