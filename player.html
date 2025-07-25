@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Rolagem Controlada V2</title>
+  <title>Player Rolagem Controlada V3</title>
   <style>
     html, body {
       margin: 0;
@@ -51,7 +51,7 @@
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
     #btn-baixo { bottom: 50%; right: 20px; transform: translateY(50%); }
-    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); display: none; }
+    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); }
   </style>
 </head>
 <body>
@@ -93,6 +93,11 @@
       carregarVideoAtual();
     }
 
+    function atualizarSetas() {
+      document.getElementById('btn-cima').style.display = currentIndex > 0 ? 'block' : 'none';
+      document.getElementById('btn-baixo').style.display = currentIndex < videoIds.length - 1 ? 'block' : 'none';
+    }
+
     function carregarVideoAtual() {
       const container = document.getElementById('container');
       container.innerHTML = '';
@@ -105,6 +110,12 @@
       container.appendChild(wrapper);
 
       carregando = true;
+      atualizarSetas(); // ✅ atualiza ANTES de carregar o novo vídeo
+
+      if (!somAtivado) {
+        document.getElementById('btn-som').style.display = 'block';
+      }
+
       player = new YT.Player('player', {
         videoId: videoIds[currentIndex],
         playerVars: { autoplay: 1, mute: 1, playsinline: 1 },
@@ -115,7 +126,6 @@
               player.unMute();
               document.getElementById('btn-som').style.display = 'none';
             }
-            atualizarSetas();
             carregando = false;
           }
         }
@@ -134,13 +144,6 @@
       somAtivado = true;
       if (player && player.unMute) player.unMute();
       document.getElementById('btn-som').style.display = 'none';
-    }
-
-    function atualizarSetas() {
-      const btnCima = document.getElementById('btn-cima');
-      const btnBaixo = document.getElementById('btn-baixo');
-      btnCima.style.display = currentIndex > 0 ? 'block' : 'none';
-      btnBaixo.style.display = currentIndex < videoIds.length - 1 ? 'block' : 'none';
     }
 
     function fecharPlayer() {
