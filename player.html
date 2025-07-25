@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player TikTok</title>
+  <title>Player Scroll Leve</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      background-color: black;
       overflow: hidden;
-      background: black;
     }
 
     #container {
@@ -26,68 +26,59 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
-    .player-container {
+    iframe {
       width: 100vw;
       height: 100vh;
-    }
-
-    .btn-topo {
-      position: fixed;
-      top: 16px;
-      z-index: 1000;
-      padding: 10px 14px;
       border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      background-color: rgba(0, 0, 0, 0.6);
-      color: white;
-      cursor: pointer;
     }
 
-    #btn-fechar { right: 16px; }
-    #btn-som { left: 16px; }
-
-    #contador-videos {
-      position: fixed;
+    .btn-som {
+      position: absolute;
       bottom: 16px;
       right: 16px;
-      z-index: 1000;
+      background-color: rgba(82, 255, 100, 0.9);
+      color: black;
+      border: none;
+      padding: 10px 16px;
       font-size: 14px;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-family: sans-serif;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 10;
     }
 
-    #logo-player {
+    .btn-som:hover {
+      background-color: rgba(60, 200, 80, 1);
+    }
+
+    .btn-fechar {
       position: fixed;
-      bottom: 16px;
-      left: 16px;
-      width: 56px;
-      z-index: 1000;
-      opacity: 0.95;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      background-color: rgba(255, 82, 82, 0.9);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
     }
   </style>
-  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-  <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
-  <button id="btn-som" class="btn-topo">🔇 som</button>
-  <div id="contador-videos">📹 1 / 1</div>
+
+  <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
+
   <div id="container"></div>
-  <img id="logo-player" src="icons/logo-transpa.png" alt="Logo Diário de Viagem" />
 
   <script>
     const container = document.getElementById('container');
-    const contador = document.getElementById('contador-videos');
     const videoIds = [];
-    let players = {};
-    let isPlayerReady = {};
-    let indexAtual = 0;
-    let somAtivado = false;
+    const players = [];
 
     const params = new URLSearchParams(window.location.search);
     const videoInicial = params.get('v');
@@ -111,128 +102,54 @@
       if (foundIndex >= 0) indexInicial = foundIndex;
     }
 
-    videoIds.forEach((_, i) => {
+    function criarIframe(videoId) {
       const wrapper = document.createElement('div');
       wrapper.className = 'video-wrapper';
 
-      const div = document.createElement('div');
-      div.id = `player-${i}`;
-      div.className = 'player-container';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&playsinline=1`;
+      iframe.allow = 'autoplay; encrypted-media; fullscreen';
+      wrapper.appendChild(iframe);
 
-      wrapper.appendChild(div);
-      container.appendChild(wrapper);
-    });
+      const botaoSom = document.createElement('button');
+      botaoSom.className = 'btn-som';
+      botaoSom.textContent = '🔊 Ativar som';
+      botaoSom.onclick = () => {
+        iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+        botaoSom.style.display = 'none';
+      };
 
-    function atualizarContador() {
-      contador.textContent = `📹 ${indexAtual + 1} / ${videoIds.length}`;
+      wrapper.appendChild(botaoSom);
+      return wrapper;
     }
 
-    function criarPlayer(i) {
-      return new Promise(resolve => {
-        if (players[i]) return resolve();
+    function inicializar() {
+      const start = Math.max(0, indexInicial - 1);
+      const end = Math.min(videoIds.length, indexInicial + 2);
 
-        const divId = `player-${i}`;
-        players[i] = new YT.Player(divId, {
-          videoId: videoIds[i],
-          playerVars: { autoplay: 1, mute: 1, playsinline: 1 }, // autoplay só com mute
-          events: {
-            onReady: event => {
-              isPlayerReady[i] = true;
-              if (i !== indexAtual) {
-                try { event.target.pauseVideo(); } catch (_) {}
-              }
-              resolve();
-            }
-          }
-        });
+      for (let i = start; i < end; i++) {
+        const el = criarIframe(videoIds[i]);
+        container.appendChild(el);
+        players.push(el);
+      }
+
+      // Scroll inicial
+      requestAnimationFrame(() => {
+        container.scrollTo({ top: (indexInicial - start) * window.innerHeight });
       });
     }
 
-    function destruirPlayer(i) {
-      if (players[i]) {
-        players[i].destroy();
-        delete players[i];
-        delete isPlayerReady[i];
-      }
-    }
-
-    async function manterApenas(i) {
-      const ativos = [i - 1, i, i + 1].filter(j => j >= 0 && j < videoIds.length);
-      await Promise.all(ativos.map(j => criarPlayer(j)));
-      for (let j = 0; j < videoIds.length; j++) {
-        if (!ativos.includes(j)) destruirPlayer(j);
-      }
-    }
-
-    async function scrollToIndex(i) {
-      indexAtual = i;
-      atualizarContador();
-      await manterApenas(i);
-      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
-      tocarVideo(i);
-    }
-
-    async function tocarVideo(i) {
-      const player = players[i];
-      if (player && isPlayerReady[i]) {
-        try {
-          await player.playVideo();
-          if (somAtivado) player.unMute();
-        } catch (e) {
-          console.warn('Erro ao tocar vídeo:', e);
-        }
-      }
-    }
-
-    window.onYouTubeIframeAPIReady = async () => {
-      await manterApenas(indexInicial);
-      await scrollToIndex(indexInicial);
-    };
-
-    container.addEventListener('scroll', async () => {
-      const i = Math.round(container.scrollTop / window.innerHeight);
-      if (i === indexAtual) return;
-
-      indexAtual = i;
-      atualizarContador();
-      await manterApenas(i);
-
-      Object.entries(players).forEach(([idxStr, player]) => {
-        const idx = parseInt(idxStr);
-        if (!isPlayerReady[idx]) return;
-
-        if (idx === i) {
-          try {
-            player.playVideo();
-            if (somAtivado) player.unMute();
-          } catch (e) {}
-        } else {
-          try {
-            player.pauseVideo();
-            player.mute();
-          } catch (e) {}
-        }
-      });
-    });
-
-    document.getElementById('btn-som').addEventListener('click', () => {
-      somAtivado = !somAtivado;
-      Object.entries(players).forEach(([_, player]) => {
-        try {
-          somAtivado ? player.unMute() : player.mute();
-        } catch (_) {}
-      });
-      document.getElementById('btn-som').textContent = somAtivado ? '🔊 som' : '🔇 som';
-    });
-
-    document.getElementById('btn-fechar').addEventListener('click', () => {
+    function fecharPlayer() {
       try {
         window.opener?.postMessage('fechar-player', '*');
         window.parent?.postMessage('fechar-player', '*');
         window.top?.postMessage('fechar-player', '*');
       } catch (e) {}
       window.close();
-    });
+    }
+
+    inicializar();
   </script>
+
 </body>
 </html>
