@@ -68,7 +68,7 @@
 </head>
 <body>
   <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
-  <button id="btn-som" class="btn-topo">🔊 Ativar som</button>
+  <button id="btn-som" class="btn-topo">🔊 som</button>
   <button id="btn-scroll" class="btn-topo">Modo Tik</button>
   <div id="contador-videos">Mídia 1 / 1</div>
 
@@ -241,7 +241,7 @@
     document.getElementById('btn-som').addEventListener('click', () => {
       somAtivado = !somAtivado;
       mapaPlayers.forEach(player => somAtivado ? player.unMute() : player.mute());
-      document.getElementById('btn-som').textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
+      document.getElementById('btn-som').textContent = somAtivado ? '🔇 som' : '🔊 som';
     });
 
     document.getElementById('btn-fechar').addEventListener('click', () => {
