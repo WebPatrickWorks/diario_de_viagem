@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Rolagem Controlada</title>
+  <title>Player Rolagem Controlada V2</title>
   <style>
     html, body {
       margin: 0;
@@ -31,6 +31,11 @@
       left: 0;
     }
 
+    #player {
+      width: 100vw;
+      height: 100vh;
+    }
+
     .btn {
       position: fixed;
       z-index: 9999;
@@ -46,7 +51,7 @@
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
     #btn-baixo { bottom: 50%; right: 20px; transform: translateY(50%); }
-    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); }
+    #btn-cima { top: 50%; right: 20px; transform: translateY(-50%); display: none; }
   </style>
 </head>
 <body>
@@ -106,7 +111,11 @@
         events: {
           onReady: () => {
             player.playVideo();
-            if (somAtivado) player.unMute();
+            if (somAtivado) {
+              player.unMute();
+              document.getElementById('btn-som').style.display = 'none';
+            }
+            atualizarSetas();
             carregando = false;
           }
         }
@@ -125,6 +134,13 @@
       somAtivado = true;
       if (player && player.unMute) player.unMute();
       document.getElementById('btn-som').style.display = 'none';
+    }
+
+    function atualizarSetas() {
+      const btnCima = document.getElementById('btn-cima');
+      const btnBaixo = document.getElementById('btn-baixo');
+      btnCima.style.display = currentIndex > 0 ? 'block' : 'none';
+      btnBaixo.style.display = currentIndex < videoIds.length - 1 ? 'block' : 'none';
     }
 
     function fecharPlayer() {
