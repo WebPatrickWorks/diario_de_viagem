@@ -2,258 +2,134 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player Galeria</title>
+  <title>Assistir Vídeo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      background-color: black;
       overflow: hidden;
-      background: black;
     }
 
-    #container {
-      height: 100vh;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .item-wrapper {
-      height: 100vh;
-      scroll-snap-align: start;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .player-container, .foto-container {
+    #player {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: cover;
+      z-index: 0;
     }
 
-    .btn-topo {
+    .btn-fechar {
       position: fixed;
       top: 16px;
-      z-index: 1000;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      background-color: rgba(0, 0, 0, 0.6);
+      right: 16px;
+      z-index: 9999;
+      background-color: rgba(255, 82, 82, 0.9);
       color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s;
     }
 
-    #btn-fechar { right: 16px; }
-    #btn-som { left: 16px; }
-    #btn-scroll { left: 150px; }
+    .btn-fechar:hover {
+      background-color: rgba(230, 50, 50, 1);
+    }
 
-    #contador-videos {
+    .btn-som {
       position: fixed;
       bottom: 16px;
       right: 16px;
-      z-index: 1000;
-      font-size: 14px;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-family: sans-serif;
+      z-index: 9999;
+      background-color: rgba(82, 255, 100, 0.9);
+      color: black;
+      border: none;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s;
+    }
+
+    .btn-som:hover {
+      background-color: rgba(60, 200, 80, 1);
+    }
+
+    @media (max-width: 600px) {
+      .btn-fechar, .btn-som {
+        font-size: 14px;
+        padding: 8px 14px;
+      }
+
+      .btn-fechar {
+        top: 12px;
+        right: 12px;
+      }
+
+      .btn-som {
+        bottom: 12px;
+        right: 12px;
+      }
     }
   </style>
-  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-  <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
-  <button id="btn-som" class="btn-topo">🔊 Ativar som</button>
-  <button id="btn-scroll" class="btn-topo">🎞️ Modo TikTok</button>
-  <div id="contador-videos">📹 1 / 1</div>
 
-  <div id="container"></div>
+  <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
+  <button class="btn-som" id="btnSom" onclick="ativarSom()">🔊 Ativar Som</button>
+
+  <div id="player"></div>
 
   <script>
-    const container = document.getElementById('container');
-    const mapaPlayers = new Map(); // chave: índice no midias[], valor: player
-    let indexAtual = 0;
-    let somAtivado = false;
-    let modoTikTok = true;
-    let observer;
-
-    const contador = document.getElementById('contador-videos');
-    const params = new URLSearchParams(window.location.search);
-    const videoInicial = params.get('v');
-    let indexInicial = 0;
-
-    const midias = [];
-
-    try {
-      const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
-      Object.values(cache).forEach(cidade => {
-        const fotos = cidade.fotos || [];
-        fotos.forEach(url => midias.push({ tipo: 'foto', url }));
-
-        const videos = cidade.videos || [];
-        videos.forEach(url => {
-          const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
-          if (match && match[1]) {
-            midias.push({ tipo: 'video', id: match[1] });
-          } else {
-            console.warn('Link de vídeo inválido:', url);
-          }
-        });
-      });
-    } catch (e) {
-      console.warn('Erro ao carregar cache:', e);
+    function fecharPlayer() {
+      window.opener?.postMessage('fechar-player', '*');
+      window.history.back();
     }
 
-    function renderizarMidias() {
-      container.innerHTML = '';
-      let playerIndex = 0;
-      midias.forEach((m, i) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'item-wrapper';
-
-        if (m.tipo === 'foto') {
-          const el = document.createElement('img');
-          el.src = m.url;
-          el.className = 'foto-container';
-          wrapper.appendChild(el);
-        } else {
-          const el = document.createElement('div');
-          el.id = `player-${i}`;
-          el.className = 'player-container';
-          wrapper.appendChild(el);
-        }
-
-        container.appendChild(wrapper);
-      });
-    }
-
-    renderizarMidias();
+    let player;
 
     function onYouTubeIframeAPIReady() {
-      midias.forEach((m, i) => {
-        if (m.tipo !== 'video') return;
+      const params = new URLSearchParams(window.location.search);
+      const videoId = params.get('v');
 
-        const player = new YT.Player(`player-${i}`, {
-          videoId: m.id,
-          playerVars: {
-            autoplay: i === indexInicial ? 1 : 0,
-            mute: 1,
-            playsinline: 1
-          },
-          events: {
-            onReady: (event) => {
-              if (i !== indexInicial) event.target.pauseVideo();
-              if (i === indexInicial && somAtivado) event.target.unMute();
-            }
-          }
-        });
-        mapaPlayers.set(i, player);
-      });
-    }
+      if (!videoId) {
+        document.body.innerHTML = '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
+        return;
+      }
 
-    function atualizarContador() {
-      contador.textContent = `📹 ${indexAtual + 1} / ${midias.length}`;
-    }
-
-    container.addEventListener('scroll', () => {
-      if (!modoTikTok) return;
-      const pos = container.scrollTop;
-      const index = Math.round(pos / window.innerHeight);
-      if (index === indexAtual) return;
-      indexAtual = index;
-      atualizarContador();
-
-      mapaPlayers.forEach((player, idx) => {
-        if (idx === index) {
-          player.pauseVideo();
-          setTimeout(() => {
-            player.seekTo(0, true);
-            player.playVideo();
-            if (somAtivado) player.unMute();
-          }, 300); // pequeno delay ajuda a garantir o seek
-        } else {
-          player.pauseVideo();
-          player.mute();
+      player = new YT.Player('player', {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1
+        },
+        events: {
+          onReady: event => event.target.playVideo()
         }
       });
-    });
-
-    function ativarInstagramMode() {
-      container.style.scrollSnapType = 'none';
-      document.querySelectorAll('.item-wrapper').forEach(el => {
-        el.style.scrollSnapAlign = 'none';
-      });
-      observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const el = entry.target;
-          const index = Array.from(container.children).indexOf(el);
-          if (index === -1 || !midias[index]) return;
-
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            indexAtual = index;
-            atualizarContador();
-            if (midias[index].tipo === 'video') {
-              const player = mapaPlayers.get(index);
-              if (player) {
-                player.pauseVideo();
-                setTimeout(() => {
-                  player.seekTo(0, true);
-                  player.playVideo();
-                  if (somAtivado) player.unMute();
-                }, 300);
-              }
-            }
-          } else {
-            if (midias[index].tipo === 'video') {
-              const player = mapaPlayers.get(index);
-              if (player) {
-                player.pauseVideo();
-                player.mute();
-              }
-            }
-          }
-        });
-      }, { threshold: 0.5 });
-
-      document.querySelectorAll('.item-wrapper').forEach(el => observer.observe(el));
     }
 
-    function ativarTikTokMode() {
-      container.style.scrollSnapType = 'y mandatory';
-      document.querySelectorAll('.item-wrapper').forEach(el => {
-        el.style.scrollSnapAlign = 'start';
-      });
-      if (observer) observer.disconnect();
-    }
-
-    document.getElementById('btn-scroll').addEventListener('click', () => {
-      modoTikTok = !modoTikTok;
-      const btn = document.getElementById('btn-scroll');
-      btn.textContent = modoTikTok ? '🎞️ Modo TikTok' : '📱 Modo Insta';
-      modoTikTok ? ativarTikTokMode() : ativarInstagramMode();
-    });
-
-    document.getElementById('btn-som').addEventListener('click', () => {
-      somAtivado = !somAtivado;
-      mapaPlayers.forEach(player => somAtivado ? player.unMute() : player.mute());
-      document.getElementById('btn-som').textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
-    });
-
-    document.getElementById('btn-fechar').addEventListener('click', () => {
-      try {
-        window.opener?.postMessage('fechar-player', '*');
-        window.parent?.postMessage('fechar-player', '*');
-        window.top?.postMessage('fechar-player', '*');
-      } catch (e) {
-        console.warn('❌ postMessage falhou', e);
+    function ativarSom() {
+      if (player) {
+        player.unMute();
+        player.setVolume(100);
+        // Oculta o botão após ativar o som
+        const btn = document.getElementById('btnSom');
+        if (btn) btn.style.display = 'none';
       }
-      window.close();
-    });
+    }
   </script>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
