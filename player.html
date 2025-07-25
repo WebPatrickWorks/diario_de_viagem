@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Player Vertical</title>
+  <title>Player Galeria</title>
   <style>
     html, body {
       margin: 0;
@@ -20,7 +20,7 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    .video-wrapper {
+    .item-wrapper {
       height: 100vh;
       scroll-snap-align: start;
       display: flex;
@@ -28,9 +28,10 @@
       justify-content: center;
     }
 
-    .player-container {
+    .player-container, .foto-container {
       width: 100vw;
       height: 100vh;
+      object-fit: cover;
     }
 
     .btn-topo {
@@ -46,17 +47,10 @@
       cursor: pointer;
     }
 
-    #btn-fechar {
-      right: 16px;
-    }
-
-    #btn-som {
-      left: 16px;
-    }
-
-    #btn-scroll {
-      left: 150px;
-    }
+    #btn-fechar { right: 16px; }
+    #btn-som { left: 16px; }
+    #btn-scroll { left: 150px; }
+    #btn-modo { left: 300px; }
 
     #contador-videos {
       position: fixed;
@@ -77,70 +71,71 @@
   <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
   <button id="btn-som" class="btn-topo">🔊 Ativar som</button>
   <button id="btn-scroll" class="btn-topo">🎞️ Modo TikTok</button>
+  <button id="btn-modo" class="btn-topo">📷 Modo: Todos</button>
   <div id="contador-videos">📹 1 / 1</div>
 
   <div id="container"></div>
 
   <script>
     const container = document.getElementById('container');
-    const videoIds = [];
     const players = [];
-    let playerDivs = [];
     let indexAtual = 0;
     let somAtivado = false;
     let modoTikTok = true;
+    let modoAtual = 'todos';
     let observer;
-    const contador = document.getElementById('contador-videos');
 
+    const contador = document.getElementById('contador-videos');
     const params = new URLSearchParams(window.location.search);
     const videoInicial = params.get('v');
     let indexInicial = 0;
 
+    const midias = [];
+
     try {
       const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
       Object.values(cache).forEach(cidade => {
+        const fotos = cidade.fotos || [];
+        fotos.forEach(url => midias.push({ tipo: 'foto', url }));
+
         const videos = cidade.videos || [];
         videos.forEach(url => {
           const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
-          if (match && match[1]) videoIds.push(match[1]);
+          if (match && match[1]) midias.push({ tipo: 'video', id: match[1] });
         });
       });
     } catch (e) {
       console.warn('Erro ao carregar cache:', e);
     }
 
-    if (videoInicial) {
-      const foundIndex = videoIds.findIndex(id => id === videoInicial);
-      if (foundIndex >= 0) indexInicial = foundIndex;
+    function renderizarMidias() {
+      container.innerHTML = '';
+      midias.forEach((m, i) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'item-wrapper';
+        const el = document.createElement(m.tipo === 'foto' ? 'img' : 'div');
+
+        if (m.tipo === 'foto') {
+          el.src = m.url;
+          el.className = 'foto-container';
+        } else {
+          el.id = `player-${players.length}`;
+          el.className = 'player-container';
+        }
+
+        wrapper.appendChild(el);
+        container.appendChild(wrapper);
+      });
     }
 
-    videoIds.forEach((id, i) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'video-wrapper';
-
-      const div = document.createElement('div');
-      div.id = `player-${i}`;
-      div.className = 'player-container';
-
-      wrapper.appendChild(div);
-      container.appendChild(wrapper);
-      playerDivs.push(div.id);
-    });
-
-    function scrollToIndex(i) {
-      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
-      indexAtual = i;
-      atualizarContador();
-    }
-
-    function atualizarContador() {
-      contador.textContent = `📹 ${indexAtual + 1} / ${videoIds.length}`;
-    }
+    renderizarMidias();
 
     function onYouTubeIframeAPIReady() {
-      playerDivs.forEach((divId, i) => {
-        const player = new YT.Player(divId, {
-          videoId: videoIds[i],
+      midias.forEach((m, i) => {
+        if (m.tipo !== 'video') return;
+
+        const player = new YT.Player(`player-${players.length}`, {
+          videoId: m.id,
           playerVars: {
             autoplay: i === indexInicial ? 1 : 0,
             mute: 1,
@@ -149,15 +144,16 @@
           events: {
             onReady: (event) => {
               if (i !== indexInicial) event.target.pauseVideo();
-              if (i === indexInicial && somAtivado) {
-                event.target.unMute();
-              }
+              if (i === indexInicial && somAtivado) event.target.unMute();
             }
           }
         });
         players.push(player);
       });
-      scrollToIndex(indexInicial);
+    }
+
+    function atualizarContador() {
+      contador.textContent = `📹 ${indexAtual + 1} / ${midias.length}`;
     }
 
     container.addEventListener('scroll', () => {
@@ -169,7 +165,8 @@
       atualizarContador();
 
       players.forEach((player, i) => {
-        if (i === index) {
+        const idx = midias.findIndex(m => m.tipo === 'video' && `player-${i}` === `player-${i}`);
+        if (idx === index) {
           player.seekTo(0, true);
           player.playVideo();
           if (somAtivado) player.unMute();
@@ -182,32 +179,45 @@
 
     function ativarInstagramMode() {
       container.style.scrollSnapType = 'none';
-      document.querySelectorAll('.video-wrapper').forEach(el => {
+      document.querySelectorAll('.item-wrapper').forEach(el => {
         el.style.scrollSnapAlign = 'none';
       });
-
       observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-          const index = playerDivs.findIndex(id => id === entry.target.id);
-          if (index === -1) return;
+          const el = entry.target;
+          const index = Array.from(container.children).indexOf(el);
+          if (index === -1 || !midias[index]) return;
+
           if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
             indexAtual = index;
             atualizarContador();
-            players[index].playVideo();
-            if (somAtivado) players[index].unMute();
+            if (midias[index].tipo === 'video') {
+              const player = players.shift();
+              if (player) {
+                player.playVideo();
+                if (somAtivado) player.unMute();
+                players.push(player);
+              }
+            }
           } else {
-            players[index].pauseVideo();
-            if (somAtivado) players[index].mute();
+            if (midias[index].tipo === 'video') {
+              const player = players.shift();
+              if (player) {
+                player.pauseVideo();
+                if (somAtivado) player.mute();
+                players.push(player);
+              }
+            }
           }
         });
       }, { threshold: 0.5 });
 
-      playerDivs.forEach(id => observer.observe(document.getElementById(id)));
+      document.querySelectorAll('.item-wrapper').forEach(el => observer.observe(el));
     }
 
     function ativarTikTokMode() {
       container.style.scrollSnapType = 'y mandatory';
-      document.querySelectorAll('.video-wrapper').forEach(el => {
+      document.querySelectorAll('.item-wrapper').forEach(el => {
         el.style.scrollSnapAlign = 'start';
       });
       if (observer) observer.disconnect();
@@ -216,25 +226,21 @@
     document.getElementById('btn-scroll').addEventListener('click', () => {
       modoTikTok = !modoTikTok;
       const btn = document.getElementById('btn-scroll');
-      btn.textContent = modoTikTok ? 'Modo TikTok' : 'Modo Insta';
-      if (modoTikTok) {
-        ativarTikTokMode();
-      } else {
-        ativarInstagramMode();
-      }
+      btn.textContent = modoTikTok ? 'Modo Tik' : 'Modo Insta';
+      modoTikTok ? ativarTikTokMode() : ativarInstagramMode();
     });
 
-    const btnSom = document.getElementById('btn-som');
-    btnSom.addEventListener('click', () => {
+    document.getElementById('btn-som').addEventListener('click', () => {
       somAtivado = !somAtivado;
-      players.forEach((player, i) => {
-        if (somAtivado) {
-          player.unMute();
-        } else {
-          player.mute();
-        }
-      });
-      btnSom.textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
+      players.forEach(player => somAtivado ? player.unMute() : player.mute());
+      document.getElementById('btn-som').textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
+    });
+
+    document.getElementById('btn-modo').addEventListener('click', () => {
+      modoAtual = modoAtual === 'todos' ? 'videos' : (modoAtual === 'videos' ? 'fotos' : 'todos');
+      const label = modoAtual === 'todos' ? '📷 Modo: Todos' : modoAtual === 'videos' ? '🎬 Modo: Vídeos' : '🖼️ Modo: Fotos';
+      document.getElementById('btn-modo').textContent = label;
+      // Aqui você poderia aplicar filtros no array de midias se quiser alternar o conteúdo, mantivemos todos por enquanto.
     });
 
     document.getElementById('btn-fechar').addEventListener('click', () => {
