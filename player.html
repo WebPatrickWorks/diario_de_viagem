@@ -2,134 +2,251 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Assistir Vídeo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Vertical</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: black;
       overflow: hidden;
+      background: black;
     }
 
-    #player {
-      position: fixed;
-      top: 0;
-      left: 0;
+    #container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .video-wrapper {
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-container {
       width: 100vw;
       height: 100vh;
-      z-index: 0;
     }
 
-    .btn-fechar {
+    .btn-topo {
       position: fixed;
       top: 16px;
-      right: 16px;
-      z-index: 9999;
-      background-color: rgba(255, 82, 82, 0.9);
-      color: white;
+      z-index: 1000;
+      padding: 10px 14px;
       border: none;
-      padding: 10px 16px;
-      font-size: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s;
     }
 
-    .btn-fechar:hover {
-      background-color: rgba(230, 50, 50, 1);
+    #btn-fechar {
+      right: 16px;
     }
 
-    .btn-som {
+    #btn-som {
+      left: 16px;
+    }
+
+    #btn-scroll {
+      left: 100px;
+    }
+
+    #contador-videos {
       position: fixed;
       bottom: 16px;
       right: 16px;
-      z-index: 9999;
-      background-color: rgba(82, 255, 100, 0.9);
-      color: black;
-      border: none;
-      padding: 10px 16px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s;
-    }
-
-    .btn-som:hover {
-      background-color: rgba(60, 200, 80, 1);
-    }
-
-    @media (max-width: 600px) {
-      .btn-fechar, .btn-som {
-        font-size: 14px;
-        padding: 8px 14px;
-      }
-
-      .btn-fechar {
-        top: 12px;
-        right: 12px;
-      }
-
-      .btn-som {
-        bottom: 12px;
-        right: 12px;
-      }
+      z-index: 1000;
+      font-size: 14px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: sans-serif;
     }
   </style>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
+  <button id="btn-fechar" class="btn-topo">✖ Fechar</button>
+  <button id="btn-som" class="btn-topo">🔇 som</button>
+  <button id="btn-scroll" class="btn-topo">Modo Tik</button>
+  <div id="contador-videos">📹 1 / 1</div>
 
-  <button class="btn-fechar" onclick="fecharPlayer()">✖ Fechar</button>
-  <button class="btn-som" id="btnSom" onclick="ativarSom()">🔊 Ativar Som</button>
-
-  <div id="player"></div>
+  <div id="container"></div>
 
   <script>
-    function fecharPlayer() {
-      window.opener?.postMessage('fechar-player', '*');
-      window.history.back();
+    const container = document.getElementById('container');
+    const videoIds = [];
+    const players = [];
+    let playerDivs = [];
+    let indexAtual = 0;
+    let somAtivado = false;
+    let modoTikTok = true;
+    let observer;
+    const contador = document.getElementById('contador-videos');
+
+    const params = new URLSearchParams(window.location.search);
+    const videoInicial = params.get('v');
+    let indexInicial = 0;
+
+    try {
+      const cache = JSON.parse(localStorage.getItem('cacheGaleria') || '{}');
+      Object.values(cache).forEach(cidade => {
+        const videos = cidade.videos || [];
+        videos.forEach(url => {
+          const match = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?&]+)/);
+          if (match && match[1]) videoIds.push(match[1]);
+        });
+      });
+    } catch (e) {
+      console.warn('Erro ao carregar cache:', e);
     }
 
-    let player;
+    if (videoInicial) {
+      const foundIndex = videoIds.findIndex(id => id === videoInicial);
+      if (foundIndex >= 0) indexInicial = foundIndex;
+    }
+
+    videoIds.forEach((id, i) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'video-wrapper';
+
+      const div = document.createElement('div');
+      div.id = `player-${i}`;
+      div.className = 'player-container';
+
+      wrapper.appendChild(div);
+      container.appendChild(wrapper);
+      playerDivs.push(div.id);
+    });
+
+    function scrollToIndex(i) {
+      container.scrollTo({ top: i * window.innerHeight, behavior: 'instant' });
+      indexAtual = i;
+      atualizarContador();
+    }
+
+    function atualizarContador() {
+      contador.textContent = `📹 ${indexAtual + 1} / ${videoIds.length}`;
+    }
 
     function onYouTubeIframeAPIReady() {
-      const params = new URLSearchParams(window.location.search);
-      const videoId = params.get('v');
+      playerDivs.forEach((divId, i) => {
+        const player = new YT.Player(divId, {
+          videoId: videoIds[i],
+          playerVars: {
+            autoplay: i === indexInicial ? 1 : 0,
+            mute: 1,
+            playsinline: 1
+          },
+          events: {
+            onReady: (event) => {
+              if (i !== indexInicial) event.target.pauseVideo();
+              if (i === indexInicial && somAtivado) {
+                event.target.unMute();
+              }
+            }
+          }
+        });
+        players.push(player);
+      });
+      scrollToIndex(indexInicial);
+    }
 
-      if (!videoId) {
-        document.body.innerHTML = '<p style="color:white;text-align:center;margin-top:20px">❌ Vídeo inválido</p>';
-        return;
-      }
+    container.addEventListener('scroll', () => {
+      if (!modoTikTok) return;
+      const pos = container.scrollTop;
+      const index = Math.round(pos / window.innerHeight);
+      if (index === indexAtual) return;
+      indexAtual = index;
+      atualizarContador();
 
-      player = new YT.Player('player', {
-        videoId: videoId,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1
-        },
-        events: {
-          onReady: event => event.target.playVideo()
+      players.forEach((player, i) => {
+        if (i === index) {
+          player.seekTo(0, true);
+          player.playVideo();
+          if (somAtivado) player.unMute();
+        } else {
+          player.pauseVideo();
+          if (somAtivado) player.mute();
         }
       });
+    });
+
+    function ativarInstagramMode() {
+      container.style.scrollSnapType = 'none';
+      document.querySelectorAll('.video-wrapper').forEach(el => {
+        el.style.scrollSnapAlign = 'none';
+      });
+
+      observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const index = playerDivs.findIndex(id => id === entry.target.id);
+          if (index === -1) return;
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            indexAtual = index;
+            atualizarContador();
+            players[index].playVideo();
+            if (somAtivado) players[index].unMute();
+          } else {
+            players[index].pauseVideo();
+            if (somAtivado) players[index].mute();
+          }
+        });
+      }, { threshold: 0.5 });
+
+      playerDivs.forEach(id => observer.observe(document.getElementById(id)));
     }
 
-    function ativarSom() {
-      if (player) {
-        player.unMute();
-        player.setVolume(100);
-        // Oculta o botão após ativar o som
-        const btn = document.getElementById('btnSom');
-        if (btn) btn.style.display = 'none';
+    function ativarTikTokMode() {
+      container.style.scrollSnapType = 'y mandatory';
+      document.querySelectorAll('.video-wrapper').forEach(el => {
+        el.style.scrollSnapAlign = 'start';
+      });
+      if (observer) observer.disconnect();
+    }
+
+    document.getElementById('btn-scroll').addEventListener('click', () => {
+      modoTikTok = !modoTikTok;
+      const btn = document.getElementById('btn-scroll');
+      btn.textContent = modoTikTok ? 'Modo Tik' : 'Modo Insta';
+      if (modoTikTok) {
+        ativarTikTokMode();
+      } else {
+        ativarInstagramMode();
       }
-    }
-  </script>
+    });
 
-  <script src="https://www.youtube.com/iframe_api"></script>
+    const btnSom = document.getElementById('btn-som');
+    btnSom.addEventListener('click', () => {
+      somAtivado = !somAtivado;
+      players.forEach((player, i) => {
+        if (somAtivado) {
+          player.unMute();
+        } else {
+          player.mute();
+        }
+      });
+      btnSom.textContent = somAtivado ? '🔊 som' : '🔇 som';
+    });
+
+    document.getElementById('btn-fechar').addEventListener('click', () => {
+      try {
+        window.opener?.postMessage('fechar-player', '*');
+        window.parent?.postMessage('fechar-player', '*');
+        window.top?.postMessage('fechar-player', '*');
+      } catch (e) {
+        console.warn('❌ postMessage falhou', e);
+      }
+      window.close();
+    });
+  </script>
 </body>
 </html>
