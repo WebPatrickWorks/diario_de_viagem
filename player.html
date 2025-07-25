@@ -76,7 +76,7 @@
 
   <script>
     const container = document.getElementById('container');
-    const players = [];
+    const mapaPlayers = new Map(); // chave: índice no midias[], valor: player
     let indexAtual = 0;
     let somAtivado = false;
     let modoTikTok = true;
@@ -112,7 +112,7 @@
     function renderizarMidias() {
       container.innerHTML = '';
       let playerIndex = 0;
-      midias.forEach((m) => {
+      midias.forEach((m, i) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'item-wrapper';
 
@@ -123,10 +123,9 @@
           wrapper.appendChild(el);
         } else {
           const el = document.createElement('div');
-          el.id = `player-${playerIndex}`;
+          el.id = `player-${i}`;
           el.className = 'player-container';
           wrapper.appendChild(el);
-          playerIndex++;
         }
 
         container.appendChild(wrapper);
@@ -136,11 +135,10 @@
     renderizarMidias();
 
     function onYouTubeIframeAPIReady() {
-      let playerIndex = 0;
       midias.forEach((m, i) => {
         if (m.tipo !== 'video') return;
 
-        const player = new YT.Player(`player-${playerIndex}`, {
+        const player = new YT.Player(`player-${i}`, {
           videoId: m.id,
           playerVars: {
             autoplay: i === indexInicial ? 1 : 0,
@@ -154,8 +152,7 @@
             }
           }
         });
-        players.push(player);
-        playerIndex++;
+        mapaPlayers.set(i, player);
       });
     }
 
@@ -171,15 +168,14 @@
       indexAtual = index;
       atualizarContador();
 
-      players.forEach((player, i) => {
-        const midiaIndex = midias.findIndex((m, idx) => m.tipo === 'video' && idx === index);
-        if (midiaIndex === index) {
+      mapaPlayers.forEach((player, idx) => {
+        if (idx === index) {
           player.seekTo(0, true);
           player.playVideo();
           if (somAtivado) player.unMute();
         } else {
           player.pauseVideo();
-          if (somAtivado) player.mute();
+          player.mute();
         }
       });
     });
@@ -199,20 +195,18 @@
             indexAtual = index;
             atualizarContador();
             if (midias[index].tipo === 'video') {
-              const player = players.shift();
+              const player = mapaPlayers.get(index);
               if (player) {
                 player.playVideo();
                 if (somAtivado) player.unMute();
-                players.push(player);
               }
             }
           } else {
             if (midias[index].tipo === 'video') {
-              const player = players.shift();
+              const player = mapaPlayers.get(index);
               if (player) {
                 player.pauseVideo();
-                if (somAtivado) player.mute();
-                players.push(player);
+                player.mute();
               }
             }
           }
@@ -239,7 +233,7 @@
 
     document.getElementById('btn-som').addEventListener('click', () => {
       somAtivado = !somAtivado;
-      players.forEach(player => somAtivado ? player.unMute() : player.mute());
+      mapaPlayers.forEach(player => somAtivado ? player.unMute() : player.mute());
       document.getElementById('btn-som').textContent = somAtivado ? '🔇 Desativar som' : '🔊 Ativar som';
     });
 
