@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Gesto Controlado V10</title>
+  <title>Player Gesto Controlado V11</title>
   <style>
     html, body {
       margin: 0;
@@ -52,10 +52,26 @@
 
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
+
+    #mensagem-fim {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 22px;
+      font-family: sans-serif;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 16px 24px;
+      border-radius: 10px;
+      display: none;
+      z-index: 10000;
+    }
   </style>
 </head>
 <body>
   <div id="container"></div>
+  <div id="mensagem-fim">📍 Fim dos vídeos</div>
   <button id="btn-fechar" class="btn" onclick="fecharPlayer()">✖ Fechar</button>
   <button id="btn-som" class="btn" onclick="alternarSom()">🔊 Ativar Som</button>
 
@@ -93,6 +109,8 @@
 
     function carregarVideoAtual() {
       const container = document.getElementById('container');
+      const fimMsg = document.getElementById('mensagem-fim');
+      fimMsg.style.display = 'none';
       container.innerHTML = '';
       const wrapper = document.createElement('div');
       wrapper.className = 'video-wrapper';
@@ -116,7 +134,11 @@
           },
           onStateChange: (event) => {
             if (event.data === YT.PlayerState.ENDED) {
-              trocarVideo(1); // ▶️ Avança automaticamente
+              if (currentIndex < videoIds.length - 1) {
+                trocarVideo(1);
+              } else {
+                fimMsg.style.display = 'block';
+              }
             }
           }
         }
