@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Rolagem Controlada V4</title>
+  <title>Player Gesto Controlado V5</title>
   <style>
     html, body {
       margin: 0;
@@ -16,8 +16,9 @@
 
     #container {
       height: 100vh;
-      overflow: hidden;
+      width: 100vw;
       position: relative;
+      touch-action: pan-y;
     }
 
     .video-wrapper {
@@ -50,16 +51,12 @@
 
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
-    #btn-baixo { bottom: 45%; right: 20px; transform: translateY(50%); display: none; }
-    #btn-cima { top: 55%; right: 20px; transform: translateY(-50%); display: none; }
   </style>
 </head>
 <body>
   <div id="container"></div>
   <button id="btn-fechar" class="btn" onclick="fecharPlayer()">✖ Fechar</button>
   <button id="btn-som" class="btn" onclick="ativarSom()">🔊 Ativar Som</button>
-  <button id="btn-cima" class="btn" onclick="trocarVideo(-1)">⬆</button>
-  <button id="btn-baixo" class="btn" onclick="trocarVideo(1)">⬇</button>
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
@@ -93,16 +90,7 @@
       carregarVideoAtual();
     }
 
-    function atualizarSetas() {
-      const btnCima = document.getElementById('btn-cima');
-      const btnBaixo = document.getElementById('btn-baixo');
-      btnCima.style.display = currentIndex > 0 ? 'block' : 'none';
-      btnBaixo.style.display = currentIndex < videoIds.length - 1 ? 'block' : 'none';
-    }
-
     function carregarVideoAtual() {
-      atualizarSetas(); // Corrigido: chama ANTES de limpar ou carregar
-
       const container = document.getElementById('container');
       container.innerHTML = '';
       const wrapper = document.createElement('div');
@@ -130,7 +118,6 @@
               document.getElementById('btn-som').style.display = 'none';
             }
             carregando = false;
-            atualizarSetas(); // também após onReady para garantir
           }
         }
       });
@@ -158,6 +145,24 @@
       } catch (_) {}
       window.close();
     }
+
+    // Detecção de gesto
+    let startY = null;
+
+    document.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) startY = e.touches[0].clientY;
+    });
+
+    document.addEventListener('touchend', e => {
+      if (startY === null) return;
+      const endY = e.changedTouches[0].clientY;
+      const deltaY = endY - startY;
+      if (Math.abs(deltaY) > 50 && !carregando) {
+        if (deltaY > 0) trocarVideo(-1); // swipe down
+        else trocarVideo(1); // swipe up
+      }
+      startY = null;
+    });
   </script>
 </body>
 </html>
