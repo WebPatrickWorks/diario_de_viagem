@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Gesto Controlado V11</title>
+  <title>Player Gesto Controlado V12</title>
   <style>
     html, body {
       margin: 0;
@@ -67,11 +67,39 @@
       display: none;
       z-index: 10000;
     }
+
+    #logo-contador {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+    }
+
+    #logo-contador img {
+      height: 40px;
+      opacity: 0.95;
+    }
+
+    #contador {
+      color: white;
+      font-size: 16px;
+      font-family: sans-serif;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
   </style>
 </head>
-<body>
+<body style="background-color: black;">
   <div id="container"></div>
   <div id="mensagem-fim">📍 Fim dos vídeos</div>
+  <div id="logo-contador">
+    <img src="icons/logo-transpa.png" alt="Logo">
+    <div id="contador">1 de 1</div>
+  </div>
   <button id="btn-fechar" class="btn" onclick="fecharPlayer()">✖ Fechar</button>
   <button id="btn-som" class="btn" onclick="alternarSom()">🔊 Ativar Som</button>
 
@@ -107,6 +135,11 @@
       carregarVideoAtual();
     }
 
+    function atualizarContador() {
+      const contador = document.getElementById('contador');
+      contador.textContent = `${currentIndex + 1} de ${videoIds.length}`;
+    }
+
     function carregarVideoAtual() {
       const container = document.getElementById('container');
       const fimMsg = document.getElementById('mensagem-fim');
@@ -123,6 +156,7 @@
       carregando = true;
       somAtivo = false;
       atualizarBotaoSom();
+      atualizarContador();
 
       player = new YT.Player('player', {
         videoId: videoIds[currentIndex],
