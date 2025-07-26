@@ -53,7 +53,7 @@
 
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
-    #btn-compartilhar { bottom: 96px; right: 16px; }
+    #btn-compartilhar { bottom: 96px; right: 16px; background-color: rgba(0, 0, 0, 0.1);}
 
     #logo-contador {
       position: fixed;
@@ -124,6 +124,22 @@
     #fim-overlay button:hover {
       background-color: #e04848;
     }
+
+    #alerta-copiado {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #333;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-family: sans-serif;
+      font-size: 15px;
+      z-index: 10000;
+      display: none;
+    }
+  
   </style>
 </head>
 <body style="background-color: black;">
