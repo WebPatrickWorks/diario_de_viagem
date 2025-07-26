@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Gesto Controlado V8</title>
+  <title>Player Gesto Controlado V9</title>
   <style>
     html, body {
       margin: 0;
@@ -57,7 +57,7 @@
 <body>
   <div id="container"></div>
   <button id="btn-fechar" class="btn" onclick="fecharPlayer()">✖ Fechar</button>
-  <button id="btn-som" class="btn" onclick="ativarSom()">🔊 Ativar Som</button>
+  <button id="btn-som" class="btn" onclick="alternarSom()">🔊 Ativar Som</button>
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script>
@@ -65,6 +65,7 @@
     let player;
     let currentIndex = 0;
     let carregando = false;
+    let somAtivo = false;
 
     const params = new URLSearchParams(window.location.search);
     const videoInicial = params.get('v');
@@ -102,7 +103,8 @@
       container.appendChild(wrapper);
 
       carregando = true;
-      document.getElementById('btn-som').style.display = 'block'; // 🔁 sempre mostra o botão novamente
+      somAtivo = false;
+      atualizarBotaoSom();
 
       player = new YT.Player('player', {
         videoId: videoIds[currentIndex],
@@ -124,12 +126,22 @@
       carregarVideoAtual();
     }
 
-    function ativarSom() {
-      if (player && player.unMute) {
+    function alternarSom() {
+      if (!player) return;
+      if (somAtivo) {
+        player.mute();
+        somAtivo = false;
+      } else {
         player.unMute();
         player.setVolume(100);
-        document.getElementById('btn-som').style.display = 'none';
+        somAtivo = true;
       }
+      atualizarBotaoSom();
+    }
+
+    function atualizarBotaoSom() {
+      const btn = document.getElementById('btn-som');
+      btn.textContent = somAtivo ? '🔇 Desativar Som' : '🔊 Ativar Som';
     }
 
     function fecharPlayer() {
