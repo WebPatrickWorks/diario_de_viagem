@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#000000">
   <title>Player Gesto Controlado V13</title>
   <style>
     html, body {
@@ -79,6 +78,8 @@
     }
 
     #fim-overlay {
+      opacity: 0;
+      transition: opacity 0.6s ease;
       position: fixed;
       top: 0;
       left: 0;
@@ -97,6 +98,7 @@
     }
 
     #fim-overlay img {
+      width: 96px;
       width: 64px;
       margin-bottom: 20px;
       opacity: 0.95;
@@ -123,7 +125,7 @@
     }
   </style>
 </head>
-<body style="background-color: black;">
+<body>
   <div id="container"></div>
 
   <div id="fim-overlay">
@@ -209,7 +211,7 @@
               if (currentIndex < videoIds.length - 1) {
                 trocarVideo(1);
               } else {
-                overlay.style.display = 'flex';
+                overlay.style.display = 'flex'; setTimeout(() => overlay.style.opacity = 1, 50);
               }
             }
           }
