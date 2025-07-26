@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000">
-  <title>Diário de Viagem - Player Gesto Controlado V17</title>
+  <title>Diário de Viagem - Player Gesto Controlado V16</title>
   <style>
     html, body {
       margin: 0;
@@ -53,7 +53,7 @@
 
     #btn-fechar { top: 16px; right: 16px; }
     #btn-som { bottom: 16px; right: 16px; }
-    #btn-compartilhar { bottom: 56px; right: 16px; }
+    #btn-compartilhar { bottom: 96px; right: 16px; }
 
     #logo-contador {
       position: fixed;
@@ -96,6 +96,7 @@
       text-align: center;
       z-index: 10000;
       font-family: sans-serif;
+      transition: opacity 0.6s ease;
     }
 
     #fim-overlay img {
@@ -123,20 +124,6 @@
     #fim-overlay button:hover {
       background-color: #e04848;
     }
-
-    #alerta-copiado {
-      position: fixed;
-      bottom: 100px;
-      right: 16px;
-      background-color: #333;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-family: sans-serif;
-      font-size: 14px;
-      z-index: 10000;
-      display: none;
-    }
   </style>
 </head>
 <body style="background-color: black;">
@@ -159,11 +146,14 @@
   <button id="btn-compartilhar" class="btn" onclick="compartilharLink()">🔗</button>
   <div id="alerta-copiado">Copiado para área de transferência</div>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
     const videoIds = [];
     let player;
     let currentIndex = 0;
     let carregando = false;
+              const fade = document.getElementById("fade");
+              fade.style.opacity = 0;
     let somAtivo = false;
 
     const params = new URLSearchParams(window.location.search);
@@ -197,7 +187,7 @@
         alerta.style.display = 'block';
         setTimeout(() => alerta.style.display = 'none', 2000);
       });
-    }
+    }    
 
     function atualizarContador() {
       const contador = document.getElementById('contador');
@@ -233,6 +223,7 @@
             onReady: () => {
               player.playVideo();
               carregando = false;
+              const fade = document.getElementById("fade");
               fade.style.opacity = 0;
             },
             onStateChange: (event) => {
@@ -247,7 +238,8 @@
             }
           }
         });
-      }, 100);
+
+      }, 100); // 👈 aqui está o fechamento do setTimeout
     }
 
     function trocarVideo(direcao) {
