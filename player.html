@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Gesto Controlado V6</title>
+  <title>Player Gesto Controlado V7</title>
   <style>
     html, body {
       margin: 0;
@@ -35,6 +35,7 @@
     #player {
       width: 100vw;
       height: 100vh;
+      pointer-events: none; /* deixa gestos passarem */
     }
 
     .btn {
@@ -146,16 +147,17 @@
       window.close();
     }
 
-    // Gestos com pointer
+    // Gesto por touch (mobile)
     let startY = null;
 
-    window.addEventListener('pointerdown', e => {
-      startY = e.clientY;
+    document.body.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) startY = e.touches[0].clientY;
     });
 
-    window.addEventListener('pointerup', e => {
+    document.body.addEventListener('touchend', e => {
       if (startY === null) return;
-      const deltaY = e.clientY - startY;
+      const endY = e.changedTouches[0].clientY;
+      const deltaY = endY - startY;
       if (Math.abs(deltaY) > 50 && !carregando) {
         if (deltaY > 0) trocarVideo(-1); // swipe down
         else trocarVideo(1); // swipe up
