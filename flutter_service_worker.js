@@ -3,9 +3,9 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.bin": "e4fa8e69150d95e5dcc0be3e4bcfbcdb",
-"assets/AssetManifest.bin.json": "a9203ae603877864788380daf1c16d00",
-"assets/AssetManifest.json": "e848123c346a7b4f8c11b76e952d7ffe",
+const RESOURCES = {"assets/AssetManifest.bin": "364622716ab0dae3983a01fe5a4b98be",
+"assets/AssetManifest.bin.json": "ad3175c569b548bf51210df11e98914d",
+"assets/AssetManifest.json": "0695ab07cdfa7da338f8de72919e40f6",
 "assets/assets/mapa_claro.json": "35d0e0b801444bb1f4c2115720f8e4f6",
 "assets/assets/mapa_escuro.json": "680658e17b04bef1edf9bbad1c8e1e19",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
@@ -21,8 +21,9 @@ const RESOURCES = {"assets/AssetManifest.bin": "e4fa8e69150d95e5dcc0be3e4bcfbcdb
 "assets/lib/assets/icons/play.png": "d7c57bc62b2c86868f0a1c94838a5cb8",
 "assets/lib/assets/images/logo_inicio.png": "aa6ad8785c89b27bfa67b30f6c5ed86e",
 "assets/lib/assets/map_styles/dark_map.json": "e64f2e7b6fb05d81f6d3966e8afea814",
-"assets/NOTICES": "74fedc9d02ecc6d06b8c3d48045cc00d",
+"assets/NOTICES": "cfaaeb56463697c55e936794162b9fb7",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "33b7d9392238c04c131b6ce224e13711",
+"assets/packages/google_places_flutter/images/location.json": "afa33acf2c340246c901718f4efdfccf",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "canvaskit/canvaskit.js": "728b2d477d9b8c14593d4f9b82b484f3",
 "canvaskit/canvaskit.js.symbols": "bdcd3835edf8586b6d6edfce8749fb77",
@@ -35,7 +36,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "e4fa8e69150d95e5dcc0be3e4bcfbcdb
 "canvaskit/skwasm.wasm": "39dd80367a4e71582d234948adc521c0",
 "favicon.png": "f61203628bea9d7be58c98dcf4153657",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"flutter_bootstrap.js": "6ea3a99847140e34bc5c8350de1c97d4",
+"flutter_bootstrap.js": "3a0254556143198ab297ea0442fe6d40",
 "icons/Icon-192.png": "16b0e00778d632dd5f569323d57170d7",
 "icons/Icon-512.png": "a8f4a728ac71dcbfeb4886ec75f5391d",
 "icons/Icon-maskable-192.png": "0a68e83ef9af28bf01419613560fd388",
@@ -43,7 +44,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "e4fa8e69150d95e5dcc0be3e4bcfbcdb
 "icons/logo-transpa.png": "7e36a327dfa4131400fc5a27ac1fc0df",
 "index.html": "586a538cdbb64437bb8ed9db2cc8aafc",
 "/": "586a538cdbb64437bb8ed9db2cc8aafc",
-"main.dart.js": "31b69ce97ae80bd444e344c45a8ed58b",
+"main.dart.js": "54fe4bd868eab7f9b4ad768be2eb9dd7",
 "manifest.json": "8efda82224fce8a052c5ff66b5e2f1cd",
 "player.html": "296b86587285f7b2ea65175ad64906d1",
 "version.json": "00e1cb6a49283f19d20524032df5df6f"};
